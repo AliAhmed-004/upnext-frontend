@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:upnext/pages/login_page.dart';
 
 import 'pages/home_page.dart';
 
@@ -11,6 +12,12 @@ class UpNext extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Up Next', home: const HomePage());
+    return MaterialApp(
+      title: 'Up Next',
+      routes: {
+        '/': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(),
+      },
+    );
   }
 }
