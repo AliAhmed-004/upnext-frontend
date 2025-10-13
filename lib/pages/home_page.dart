@@ -13,12 +13,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
     setState(() {
       isLoading = true;
-      errorMessage = 'An error occurred';
     });
+
+    // TODO: Fetch Data from backend
 
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
