@@ -1,19 +1,24 @@
 import 'package:flutter/widgets.dart';
+import 'package:upnext/models/listing_model.dart';
+
+import '../repositories/listing_repo.dart';
 
 class ListingProvider extends ChangeNotifier {
-  List<Map<String, dynamic>> _listings = [];
+  final _repo = ListingRepo();
+  List<ListingModel> _listings = [];
+  bool _isLoading = false;
 
-  List<Map<String, dynamic>> get listings => _listings;
+  List<ListingModel> get listings => _listings;
+  bool get isLoading => _isLoading;
 
-  void getListings() {
-    // TODO: Fetch Data from database
-    Future.delayed(const Duration(seconds: 2), () {
-      _listings = [
-        {'id': 1, 'title': 'Listing 1', 'description': 'Description 1'},
-        {'id': 2, 'title': 'Listing 2', 'description': 'Description 2'},
-        {'id': 3, 'title': 'Listing 3', 'description': 'Description 3'},
-      ];
-      notifyListeners();
-    });
+  Future<void> getListings({bool forceRefresh = false}) async {
+    // Fetch Data from repository
+    try {
+      _listings = await _repo.getListings(forceRefresh: forceRefresh);
+    } catch (e) {
+      debugPrint('Error in ListingProvider getListings: $e');
+    }
+
+    notifyListeners();
   }
 }

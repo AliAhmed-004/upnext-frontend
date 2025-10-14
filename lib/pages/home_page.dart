@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/listing_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -8,39 +11,41 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isLoading = false;
-  String errorMessage = '';
-
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      isLoading = true;
-    });
-
-    // TODO: Fetch Data from backend
-
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        isLoading = false;
-      });
-    });
+    // Trigger data fetch once when the widget is ready
+    Future.microtask(
+      () => context.read<ListingProvider>().getListings(forceRefresh: true),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<ListingProvider>();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Home Page')),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            if (isLoading) CircularProgressIndicator(),
-
-            Text('Welcome to the Home Page!'),
-          ],
-        ),
+        child: provider.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : provider.listings.isEmpty
+            ? const Center(child: Text('No listings available.'))
+            : RefreshIndicator(
+                onRefresh: () async {
+                  await provider.getListings(forceRefresh: true);
+                },
+                child: ListView.builder(
+                  itemCount: provider.listings.length,
+                  itemBuilder: (context, index) {
+                    final listing = provider.listings[index];
+                    return ListTile(
+                      title: Text(listing.title),
+                      subtitle: Text(listing.description),
+                    );
+                  },
+                ),
+              ),
       ),
     );
   }

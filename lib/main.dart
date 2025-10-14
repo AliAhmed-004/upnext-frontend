@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:upnext/pages/login_page.dart';
 
 import 'pages/home_page.dart';
+import 'providers/listing_provider.dart';
 
 void main() {
-  runApp(const UpNext());
+  // add providers
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ListingProvider(),
+      child: const UpNext(),
+    ),
+  );
 }
 
 class UpNext extends StatelessWidget {
