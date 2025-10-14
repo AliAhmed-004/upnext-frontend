@@ -1,15 +1,16 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:upnext/env.dart';
 import 'package:upnext/models/listing_model.dart';
 
 class ListingApiService {
-  final String baseUrl = 'http://10.81.6.75:8000';
-
   Future<List<ListingModel>> fetchListings() async {
     // TODO: fetch the listings from an API
     try {
-      final response = await http.get(Uri.parse('$baseUrl/listings'));
+      final response = await http.get(
+        Uri.parse('${Env.baseUrl}${Env.getListingsApi}'),
+      );
 
       if (response.statusCode == 200) {
         final List data = jsonDecode(response.body);
