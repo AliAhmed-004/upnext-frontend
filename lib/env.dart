@@ -4,4 +4,7 @@ class Env {
 
   // Listings Enpoints
   static final String getListingsApi = "/api/listings";
+
+  // Login Enpoints
+  static final String loginApi = "/api/auth/login";
 }

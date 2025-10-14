@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
+import '../services/login_service.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -71,8 +72,36 @@ class LoginPage extends StatelessWidget {
                 SizedBox(height: 24),
 
                 CustomButton(
-                  onPressed: () {
-                    // TODO Handle login logic
+                  onPressed: () async {
+                    // handle case where email or password is empty
+                    if (emailController.text.isEmpty ||
+                        passwordController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Please enter email and password'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // TODO: Handle login logic
+                    // Get the email and password from the controllers
+                    String email = emailController.text;
+                    String password = passwordController.text;
+
+                    // make API call for login
+                    final result = await LoginService.login(email, password);
+
+                    // show error message if login fails
+                    if (!result) {
+                      // Show error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Login failed. Please try again.'),
+                        ),
+                      );
+                      return;
+                    }
                     Navigator.pushReplacementNamed(context, '/home');
                   },
                   buttonText: 'Login',
