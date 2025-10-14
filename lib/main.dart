@@ -6,6 +6,7 @@ import 'pages/home_page.dart';
 import 'providers/listing_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   // add providers
   runApp(
     ChangeNotifierProvider(

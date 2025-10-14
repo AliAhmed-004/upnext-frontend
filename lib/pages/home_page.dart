@@ -27,15 +27,27 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Home Page')),
       body: SafeArea(
-        child: provider.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : provider.listings.isEmpty
-            ? const Center(child: Text('No listings available.'))
-            : RefreshIndicator(
-                onRefresh: () async {
-                  await provider.getListings(forceRefresh: true);
-                },
-                child: ListView.builder(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await provider.getListings(forceRefresh: true);
+          },
+          child: provider.isLoading
+              ? ListView(
+                  // trick to make RefreshIndicator work even when loading
+                  children: const [
+                    SizedBox(height: 300),
+                    Center(child: CircularProgressIndicator()),
+                  ],
+                )
+              : provider.listings.isEmpty
+              ? ListView(
+                  // trick: make it scrollable even when empty
+                  children: const [
+                    SizedBox(height: 300),
+                    Center(child: Text('No listings available.')),
+                  ],
+                )
+              : ListView.builder(
                   itemCount: provider.listings.length,
                   itemBuilder: (context, index) {
                     final listing = provider.listings[index];
@@ -45,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                 ),
-              ),
+        ),
       ),
     );
   }

@@ -12,6 +12,23 @@ class LoginPage extends StatelessWidget {
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
+    // Login function
+    void login() async {
+      String email = emailController.text.trim();
+      String password = passwordController.text.trim();
+
+      bool success = await LoginService.login(email, password);
+      if (success) {
+        // Navigate to Home Page
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed. Please try again.')),
+        );
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -71,41 +88,7 @@ class LoginPage extends StatelessWidget {
                 // Login Button
                 SizedBox(height: 24),
 
-                CustomButton(
-                  onPressed: () async {
-                    // handle case where email or password is empty
-                    if (emailController.text.isEmpty ||
-                        passwordController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Please enter email and password'),
-                        ),
-                      );
-                      return;
-                    }
-
-                    // TODO: Handle login logic
-                    // Get the email and password from the controllers
-                    String email = emailController.text;
-                    String password = passwordController.text;
-
-                    // make API call for login
-                    final result = await LoginService.login(email, password);
-
-                    // show error message if login fails
-                    if (!result) {
-                      // Show error message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Login failed. Please try again.'),
-                        ),
-                      );
-                      return;
-                    }
-                    Navigator.pushReplacementNamed(context, '/home');
-                  },
-                  buttonText: 'Login',
-                ),
+                CustomButton(onPressed: login, buttonText: 'Login'),
               ],
             ),
           ),

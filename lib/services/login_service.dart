@@ -1,14 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../env.dart';
 
 class LoginService {
   static Future<bool> login(String email, String password) async {
     try {
       debugPrint('Making API call to log in <============================');
-      print('Username: $email');
-      print('Password: $password');
+      debugPrint('Username: $email');
+      debugPrint('Password: $password');
 
       final response = await http.post(
         Uri.parse('${Env.baseUrl}${Env.loginApi}'),
@@ -17,18 +19,32 @@ class LoginService {
       );
 
       if (response.statusCode == 200) {
-        print('Login successful <============================');
-        print('Response Body: ${response.body}');
+        debugPrint('Login successful <============================');
+        debugPrint('Response Body: ${response.body}');
+
+        // extract user id from response body
+        final responseData = jsonDecode(response.body);
+        final userId = responseData['user']['user_id'];
+        debugPrint('User ID: $userId');
+
+        // save this user id to shared preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_id', userId);
+
+        debugPrint('User ID saved to SharedPreferences');
+
         return true;
       } else {
-        print('Login failed <============================');
-        print('Status Code: ${response.statusCode}');
-        print('Response Body: ${response.body}');
+        debugPrint('Login failed <============================');
+        debugPrint('Status Code: ${response.statusCode}');
+        debugPrint('Response Body: ${response.body}');
         return false;
       }
     } catch (error) {
-      print('Error making API call to log in <============================');
-      print(error);
+      debugPrint(
+        'Error making API call to log in <============================',
+      );
+      debugPrint(error.toString());
       return false;
     }
   }
