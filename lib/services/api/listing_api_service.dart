@@ -6,7 +6,7 @@ import 'package:upnext/models/listing_model.dart';
 
 class ListingApiService {
   Future<List<ListingModel>> fetchListings() async {
-    // TODO: fetch the listings from an API
+    // fetch the listings from an API
     try {
       final response = await http.get(
         Uri.parse('${Env.baseUrl}${Env.getListingsApi}'),
