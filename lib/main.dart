@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:upnext/pages/login_page.dart';
+import 'package:upnext/pages/splash_screen.dart';
 
 import 'pages/home_page.dart';
 import 'providers/listing_provider.dart';
@@ -23,8 +24,9 @@ class UpNext extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Up Next',
+      home: SplashScreen(),
       routes: {
-        '/': (context) => const LoginPage(),
+        '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
       },
     );
