@@ -27,6 +27,7 @@ class DatabaseService {
       CREATE TABLE user (
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
+        full_name TEXT,
         email TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )

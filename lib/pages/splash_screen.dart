@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../services/database_service.dart';
 import 'home_page.dart';
 import 'login_page.dart';
 
@@ -18,15 +18,16 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('user_id'); // must match your saved key
+    // Check if User is in Database table
+    final dbHelper = DatabaseService();
+    final user = await dbHelper.getUsers();
 
     await Future.delayed(
       const Duration(seconds: 1),
     ); // optional small delay for UX
 
     if (!mounted) return;
-    if (userId != null) {
+    if (user.isNotEmpty) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:upnext/services/database_service.dart';
 
 import '../env.dart';
 
@@ -24,16 +24,36 @@ class LoginService {
 
         // extract user id from response body
         final responseData = jsonDecode(response.body);
-        final userId = responseData['user']['user_id'];
-        debugPrint('User ID: $userId');
+        final user = responseData['user'];
 
-        // save this user id to shared preferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('user_id', userId);
+        // Save the user in Database
+        final dbHelper = DatabaseService();
 
-        debugPrint('User ID saved to SharedPreferences');
+        await dbHelper.insertUser({
+          'username': user['username'],
+          'email': user['email'],
+        });
+
+        debugPrint('User: $user saved in local database');
 
         return true;
+      } else if (response.statusCode == 401) {
+        debugPrint('Login failed: Unauthorized <============================');
+        debugPrint('Status Code: ${response.statusCode}');
+        debugPrint('Reason: ${response.reasonPhrase}');
+        return false;
+      } else if (response.statusCode == 500) {
+        debugPrint('Login failed: Server Error <============================');
+        debugPrint('Status Code: ${response.statusCode}');
+        debugPrint('Reason: ${response.reasonPhrase}');
+        return false;
+      } else if (response.statusCode == 404) {
+        debugPrint(
+          'Login failed: User not Found <============================',
+        );
+        debugPrint('Status Code: ${response.statusCode}');
+        debugPrint('Reason: ${response.reasonPhrase}');
+        return false;
       } else {
         debugPrint('Login failed <============================');
         debugPrint('Status Code: ${response.statusCode}');
