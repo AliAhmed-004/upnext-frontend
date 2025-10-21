@@ -62,10 +62,16 @@ class DatabaseService {
   // USER METHODS
   // ==================================================================
 
-  // Insetr a new user
+  // Insert a new user
   Future<int> insertUser(Map<String, dynamic> user) async {
     final db = await database;
     return await db.insert('user', user);
+  }
+
+  // Logout: Remove user from database
+  Future<void> logout() async {
+    final db = await database;
+    await db.delete('user');
   }
 
   // Get all users from database

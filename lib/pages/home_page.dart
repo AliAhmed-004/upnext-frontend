@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:upnext/services/database_service.dart';
 
 import '../providers/listing_provider.dart';
 
@@ -20,12 +21,46 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Logout confirmation dialog
+  void logoutConfirmation() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Are you sure you want to logout"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Remove user from database
+              final dbHelper = DatabaseService();
+              dbHelper.logout();
+
+              // Navigate back to login page
+              Navigator.of(context).pushReplacementNamed('/login');
+            },
+            child: Text("Yes"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("No"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ListingProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Home Page')),
+      appBar: AppBar(
+        title: const Text('Home Page'),
+        actions: [
+          IconButton(onPressed: logoutConfirmation, icon: Icon(Icons.logout)),
+        ],
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
