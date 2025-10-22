@@ -6,7 +6,10 @@ import 'package:upnext/services/database_service.dart';
 import '../env.dart';
 
 class LoginService {
-  static Future<bool> login(String email, String password) async {
+  static Future<Map<String, String>> login(
+    String email,
+    String password,
+  ) async {
     try {
       debugPrint('Making API call to log in <============================');
       debugPrint('Username: $email');
@@ -36,36 +39,45 @@ class LoginService {
 
         debugPrint('User: $user saved in local database');
 
-        return true;
+        return {'status': 'success', 'message': 'Login successful'};
       } else if (response.statusCode == 401) {
         debugPrint('Login failed: Unauthorized <============================');
         debugPrint('Status Code: ${response.statusCode}');
         debugPrint('Reason: ${response.reasonPhrase}');
-        return false;
+        return {'status': 'error', 'message': 'Incorrect password'};
       } else if (response.statusCode == 500) {
         debugPrint('Login failed: Server Error <============================');
         debugPrint('Status Code: ${response.statusCode}');
         debugPrint('Reason: ${response.reasonPhrase}');
-        return false;
+        return {
+          'status': 'error',
+          'message': 'Server error. Please try again later.',
+        };
       } else if (response.statusCode == 404) {
         debugPrint(
           'Login failed: User not Found <============================',
         );
         debugPrint('Status Code: ${response.statusCode}');
         debugPrint('Reason: ${response.reasonPhrase}');
-        return false;
+        return {'status': 'error', 'message': 'Please Sign up first'};
       } else {
         debugPrint('Login failed <============================');
         debugPrint('Status Code: ${response.statusCode}');
         debugPrint('Response Body: ${response.body}');
-        return false;
+        return {
+          'status': 'error',
+          'message': 'Login failed. Please try again.',
+        };
       }
     } catch (error) {
       debugPrint(
         'Error making API call to log in <============================',
       );
       debugPrint(error.toString());
-      return false;
+      return {
+        'status': 'error',
+        'message': 'An error occurred. Please try again.',
+      };
     }
   }
 }

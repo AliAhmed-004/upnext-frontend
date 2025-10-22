@@ -17,15 +17,15 @@ class LoginPage extends StatelessWidget {
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
 
-      bool success = await LoginService.login(email, password);
-      if (success) {
+      final response = await LoginService.login(email, password);
+      if (response['status'] == 'success') {
         // Navigate to Home Page
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed. Please try again.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(response['message']!)));
       }
     }
 
