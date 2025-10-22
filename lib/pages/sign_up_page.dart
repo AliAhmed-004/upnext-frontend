@@ -4,35 +4,30 @@ import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
 import '../services/auth_service.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
 
-    // Login function
-    void login() async {
-      String email = emailController.text.trim();
-      String password = passwordController.text.trim();
+    void signup() async {
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
+      final confirmPassword = confirmPasswordController.text.trim();
 
-      final response = await AuthService.login(email, password);
-
-      if (response['status'] == 'success') {
-        // Navigate to Home Page
-        Navigator.pushReplacementNamed(context, '/home');
-      } else {
+      if (password != confirmPassword) {
         // Show error message
+        print('Passwords do not match');
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(response['message']!)));
+        ).showSnackBar(SnackBar(content: Text('Passwords do not match')));
+        return;
       }
-    }
 
-    // Sign Up function
-    void signUp() {
-      Navigator.pushNamed(context, '/signup');
+      final response = await AuthService.signUp(email, password);
     }
 
     return Scaffold(
@@ -71,15 +66,26 @@ class LoginPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
 
-                // dont have an account? Sign up
+                // Cofirm Password Text Field
+                CustomTextfield(
+                  hintText: 'Confirm Password',
+                  controller: confirmPasswordController,
+                  obscureText: true,
+                ),
+                SizedBox(height: 16),
+
+                // Already have an account? Login Instead
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text("Don't have an account? "),
+                    Text("Already have an account? "),
                     GestureDetector(
-                      onTap: signUp,
+                      onTap: () {
+                        // Navigate to Sign Up Page
+                        Navigator.pushReplacementNamed(context, '/login');
+                      },
                       child: Text(
-                        'Sign Up',
+                        'Log in',
                         style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
@@ -92,7 +98,7 @@ class LoginPage extends StatelessWidget {
                 // Login Button
                 SizedBox(height: 24),
 
-                CustomButton(onPressed: login, buttonText: 'Login'),
+                CustomButton(onPressed: signup, buttonText: 'Sign Up'),
               ],
             ),
           ),

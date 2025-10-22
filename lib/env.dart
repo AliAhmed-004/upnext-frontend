@@ -2,9 +2,7 @@ class Env {
   // Base URL
   static final String baseUrl = 'http://10.238.222.95:8000';
 
-  // Listings Enpoints
-  static final String getListingsApi = "/api/listings";
-
-  // Login Enpoints
-  static final String loginApi = "/api/auth/login";
+  // Auth Enpoints
+  static final String loginApi = "/users/login";
+  static final String signUpApi = "/users/signup";
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:upnext/pages/login_page.dart';
+import 'package:upnext/pages/sign_up_page.dart';
 import 'package:upnext/pages/splash_screen.dart';
 
 import 'pages/home_page.dart';
@@ -28,6 +29,7 @@ class UpNext extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
+        '/signup': (context) => const SignUpPage(),
       },
     );
   }

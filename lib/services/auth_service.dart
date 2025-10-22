@@ -5,7 +5,47 @@ import 'package:upnext/services/database_service.dart';
 
 import '../env.dart';
 
-class LoginService {
+class AuthService {
+  static Future<Map<String, String>> signUp(
+    String email,
+    String password,
+  ) async {
+    try {
+      debugPrint('Making API call to sign up <============================');
+      debugPrint('Username: $email');
+      debugPrint('Password: $password');
+
+      final response = await http.post(
+        Uri.parse('${Env.baseUrl}${Env.signUpApi}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      if (response.statusCode == 201) {
+        debugPrint('Sign Up successful <============================');
+        debugPrint('Response Body: ${response.body}');
+        return {'status': 'success', 'message': 'Sign Up successful'};
+      } else {
+        debugPrint('Sign Up failed <============================');
+        debugPrint('Status Code: ${response.statusCode}');
+        debugPrint('Response Body: ${response.body}');
+        return {
+          'status': 'error',
+          'message': 'Sign Up failed. Please try again.',
+        };
+      }
+    } catch (error) {
+      debugPrint(
+        'Error making API call to sign up <============================',
+      );
+      debugPrint(error.toString());
+      return {
+        'status': 'error',
+        'message': 'An error occurred. Please try again.',
+      };
+    }
+  }
+
   static Future<Map<String, String>> login(
     String email,
     String password,
@@ -33,7 +73,7 @@ class LoginService {
         final dbHelper = DatabaseService();
 
         await dbHelper.insertUser({
-          'username': user['username'],
+          'username': user['name'],
           'email': user['email'],
         });
 
