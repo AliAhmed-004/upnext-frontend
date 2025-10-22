@@ -30,11 +30,6 @@ class LoginPage extends StatelessWidget {
       }
     }
 
-    // Sign Up function
-    void signUp() {
-      Navigator.pushNamed(context, '/signup');
-    }
-
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -77,7 +72,10 @@ class LoginPage extends StatelessWidget {
                   children: [
                     Text("Don't have an account? "),
                     GestureDetector(
-                      onTap: signUp,
+                      onTap: () {
+                        // Navigate to Sign Up Page
+                        Navigator.pushReplacementNamed(context, '/signup');
+                      },
                       child: Text(
                         'Sign Up',
                         style: TextStyle(

@@ -21,7 +21,7 @@ class AuthService {
         body: jsonEncode({'email': email, 'password': password}),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         debugPrint('Sign Up successful <============================');
         debugPrint('Response Body: ${response.body}');
         return {'status': 'success', 'message': 'Sign Up successful'};

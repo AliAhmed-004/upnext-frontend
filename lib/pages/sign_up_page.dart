@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:upnext/services/auth_service.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
-import '../services/auth_service.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -14,8 +14,8 @@ class SignUpPage extends StatelessWidget {
     final confirmPasswordController = TextEditingController();
 
     void signup() async {
-      final email = emailController.text.trim();
       final password = passwordController.text.trim();
+      final email = emailController.text.trim();
       final confirmPassword = confirmPasswordController.text.trim();
 
       if (password != confirmPassword) {
@@ -28,6 +28,16 @@ class SignUpPage extends StatelessWidget {
       }
 
       final response = await AuthService.signUp(email, password);
+
+      if (response['status'] == 'success') {
+        // Navigate to Home Page
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(response['message']!)));
+      }
     }
 
     return Scaffold(
