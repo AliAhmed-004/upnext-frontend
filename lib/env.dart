@@ -27,6 +27,7 @@ class Env {
   // Listings Endpoints
   static final String getListingsApi = "/listing/get_all";
   static final String createListingApi = "/listing/create";
+  static final String getListingById = "/listing/get_by_id";
 
   // Auth Enpoints
   static final String loginApi = "/users/login";

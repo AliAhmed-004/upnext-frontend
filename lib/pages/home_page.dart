@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/services/database_service.dart';
 
 import '../providers/listing_provider.dart';
@@ -97,10 +98,7 @@ class _HomePageState extends State<HomePage> {
                   itemCount: provider.listings.length,
                   itemBuilder: (context, index) {
                     final listing = provider.listings[index];
-                    return ListTile(
-                      title: Text(listing.title),
-                      subtitle: Text(listing.description),
-                    );
+                    return ListingTile(listingModel: listing);
                   },
                 ),
         ),
