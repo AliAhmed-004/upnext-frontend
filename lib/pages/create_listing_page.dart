@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/custom_textfield.dart';
 import 'package:upnext/models/listing_model.dart';
@@ -28,8 +30,8 @@ class _CreateListingPageState extends State<CreateListingPage> {
   }
 
   Future<void> _loadUser() async {
-    final fetched_user = await dbHelper.getUsers();
-    final currentUser = fetched_user.first;
+    final fetchedUser = await dbHelper.getUsers();
+    final currentUser = fetchedUser.first;
 
     setState(() {
       user = currentUser;
@@ -47,6 +49,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
     debugPrint("User ID: ${user['user_id']}");
 
     final listing = ListingModel(
+      id: const Uuid().v1(),
       title: title,
       user_id: user['user_id'],
       description: description,

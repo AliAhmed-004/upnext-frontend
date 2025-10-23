@@ -1,11 +1,11 @@
 class ListingModel {
-  final String? id;
+  final String id;
   final String title;
   final String user_id;
   final String description;
 
   ListingModel({
-    this.id,
+    required this.id,
     required this.title,
     required this.user_id,
     required this.description,

@@ -80,7 +80,6 @@ class _HomePageState extends State<HomePage> {
           },
           child: provider.isLoading
               ? ListView(
-                  // trick to make RefreshIndicator work even when loading
                   children: const [
                     SizedBox(height: 300),
                     Center(child: CircularProgressIndicator()),

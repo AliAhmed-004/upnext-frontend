@@ -9,7 +9,7 @@ class ListingApiService {
   Future<List<ListingModel>> fetchListings() async {
     // fetch the listings from an API
     try {
-      // TODO: Replace with actual endpoint
+      // Replace with actual endpoint
       final response = await http.get(
         Uri.parse('${Env.baseUrl}${Env.getListingsApi}'),
       );

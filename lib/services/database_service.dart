@@ -33,17 +33,6 @@ class DatabaseService {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     ''');
-
-    await db.execute('''
-      CREATE TABLE listing (
-        id TEXT PRIMARY KEY,
-        user_id INTEGER,
-        title TEXT NOT NULL,
-        description TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE
-      )
-    ''');
   }
 
   // Close the database
@@ -80,31 +69,5 @@ class DatabaseService {
     debugPrint("Fetching users from database...");
     final db = await database;
     return await db.query('user');
-  }
-
-  // ==================================================================
-  // LISTING METHODS
-  // ==================================================================
-
-  // Insert a batch of listings
-  Future<void> insertListings(List<Map<String, dynamic>> listings) async {
-    final db = await database;
-
-    final batch = db.batch();
-    for (var item in listings) {
-      batch.insert(
-        'Listing',
-        item,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-
-    await batch.commit(noResult: true);
-  }
-
-  // Get all listings from database
-  Future<List<Map<String, dynamic>>> getListings() async {
-    final db = await database;
-    return await db.query('listing');
   }
 }
