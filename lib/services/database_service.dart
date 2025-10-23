@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 
@@ -25,7 +26,7 @@ class DatabaseService {
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE user (
-        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
         full_name TEXT,
         email TEXT,
@@ -35,7 +36,7 @@ class DatabaseService {
 
     await db.execute('''
       CREATE TABLE listing (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         user_id INTEGER,
         title TEXT NOT NULL,
         description TEXT,
@@ -76,6 +77,7 @@ class DatabaseService {
 
   // Get all users from database
   Future<List<Map<String, dynamic>>> getUsers() async {
+    debugPrint("Fetching users from database...");
     final db = await database;
     return await db.query('user');
   }

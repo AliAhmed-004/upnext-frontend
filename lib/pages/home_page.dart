@@ -16,6 +16,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     // Trigger data fetch once when the widget is ready
+    _getListings();
+  }
+
+  void _getListings() {
     Future.microtask(
       () => context.read<ListingProvider>().getListings(forceRefresh: true),
     );
@@ -55,6 +59,14 @@ class _HomePageState extends State<HomePage> {
     final provider = context.watch<ListingProvider>();
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(
+            context,
+          ).pushNamed('/create_listing').then((_) => _getListings());
+        },
+        child: Icon(Icons.add),
+      ),
       appBar: AppBar(
         title: const Text('Home Page'),
         actions: [
