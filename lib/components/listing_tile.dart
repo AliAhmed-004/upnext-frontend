@@ -16,34 +16,27 @@ class ListingTile extends StatefulWidget {
 }
 
 class _ListingTileState extends State<ListingTile> {
+  late final ListingModel listing;
   String _userName = "Loading...";
 
   @override
   void initState() {
     super.initState();
+    listing = widget.listingModel;
     _getListingDetails();
   }
 
-  // Fetch details like who made the listing
   void _getListingDetails() async {
     try {
       final response = await http.get(
-        Uri.parse(
-          "${Env.baseUrl}${Env.getListingById}/${widget.listingModel.id}",
-        ),
+        Uri.parse("${Env.baseUrl}${Env.getListingById}/${listing.id}"),
       );
 
       if (response.statusCode == 200) {
-        // extract the user name from response and set _userName
-        final responseBody = jsonDecode(response.body);
+        final data = jsonDecode(response.body);
+        debugPrint("Listing Details Response: $data");
 
-        debugPrint("Listing Details Response: $responseBody");
-
-        final username = responseBody['user_name'];
-
-        setState(() {
-          _userName = username;
-        });
+        setState(() => _userName = data['user_name']);
       }
     } catch (e) {
       debugPrint("Error: $e");
@@ -53,26 +46,16 @@ class _ListingTileState extends State<ListingTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // TODO: Add the ontap functionality
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // User Name
-                Text(_userName),
-
-                // Listing Name
-                Text(widget.listingModel.title),
-
-                // Listing Description shortened
-                Text(widget.listingModel.description),
-              ],
-            ),
+            Text(_userName),
+            Text(listing.title),
+            Text(listing.description),
           ],
         ),
       ),
