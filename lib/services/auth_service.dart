@@ -15,6 +15,8 @@ class AuthService {
       debugPrint('Username: $email');
       debugPrint('Password: $password');
 
+      debugPrint('API URL: ${Env.baseUrl}${Env.signUpApi}');
+
       final response = await http.post(
         Uri.parse('${Env.baseUrl}${Env.signUpApi}'),
         headers: {'Content-Type': 'application/json'},
@@ -54,6 +56,8 @@ class AuthService {
       debugPrint('Making API call to log in <============================');
       debugPrint('Username: $email');
       debugPrint('Password: $password');
+
+      debugPrint('API URL: ${Env.baseUrl}${Env.loginApi}');
 
       final response = await http.post(
         Uri.parse('${Env.baseUrl}${Env.loginApi}'),

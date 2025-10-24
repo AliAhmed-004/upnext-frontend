@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:upnext/env.dart';
 
 import '../models/listing_model.dart';
+import '../pages/listing_details_page.dart';
 
 class ListingTile extends StatefulWidget {
   final ListingModel listingModel;
@@ -46,6 +47,14 @@ class _ListingTileState extends State<ListingTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ListingDetailsPage(listingId: listing.id),
+          ),
+        );
+      },
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),

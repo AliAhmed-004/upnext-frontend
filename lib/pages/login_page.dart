@@ -3,21 +3,52 @@ import 'package:flutter/material.dart';
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
 import '../services/auth_service.dart';
+import '../env.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+  State<LoginPage> createState() => _LoginPageState();
+}
 
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController serverIpController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the server IP field with the current base URL
+    serverIpController.text = Env.baseUrl;
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    serverIpController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Login function
     void login() async {
+      String serverUrl = serverIpController.text.trim();
+      if (serverUrl.isNotEmpty) {
+        // Update the base URL before making the request
+        await Env.setBaseUrl(serverUrl);
+      }
+
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
 
       final response = await AuthService.login(email, password);
+
+      if (!mounted)
+        return; // Check if widget is still mounted before using context
 
       if (response['status'] == 'success') {
         // Navigate to Home Page
@@ -39,7 +70,11 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // App Logo
-                Icon(Icons.recycling_rounded, size: 100, color: Colors.blue),
+                Icon(
+                  Icons.recycling_rounded,
+                  size: 100,
+                  color: Colors.greenAccent,
+                ),
                 Text(
                   'Up Next',
                   style: TextStyle(
@@ -85,6 +120,12 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+
+                CustomTextfield(
+                  hintText: 'Server IP',
+                  controller: serverIpController,
+                  obscureText: false,
                 ),
 
                 // Login Button
