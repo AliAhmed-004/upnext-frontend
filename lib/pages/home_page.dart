@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/services/database_service.dart';
 
@@ -39,8 +40,8 @@ class _HomePageState extends State<HomePage> {
               final dbHelper = DatabaseService();
               dbHelper.logout();
 
-              // Navigate back to login page
-              Navigator.of(context).pushReplacementNamed('/login');
+              // Navigate back to login page and clear all previous routes
+              Get.offAllNamed('/login');
             },
             child: Text("Yes"),
           ),
@@ -60,19 +61,41 @@ class _HomePageState extends State<HomePage> {
     final provider = context.watch<ListingProvider>();
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      backgroundColor: const Color(0xFFF8FAFC),
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(
-            context,
-          ).pushNamed('/create_listing').then((_) => _getListings());
+          Get.toNamed('/create_listing')!.then((_) => _getListings());
         },
-        child: Icon(Icons.add),
+        backgroundColor: const Color(0xFF6366F1),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text(
+          'Create',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
       ),
       appBar: AppBar(
-        title: const Text('Home Page'),
+        title: const Text(
+          'Up Next',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: Color(0xFF1F2937),
+          ),
+        ),
         actions: [
-          IconButton(onPressed: logoutConfirmation, icon: Icon(Icons.logout)),
+          IconButton(
+            onPressed: logoutConfirmation,
+            icon: const Icon(Icons.logout_rounded),
+            style: IconButton.styleFrom(
+              backgroundColor: const Color(0xFFF3F4F6),
+              foregroundColor: const Color(0xFF6B7280),
+            ),
+          ),
+          const SizedBox(width: 8),
         ],
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -80,21 +103,69 @@ class _HomePageState extends State<HomePage> {
             await provider.getListings(forceRefresh: true);
           },
           child: provider.isLoading
-              ? ListView(
-                  children: const [
-                    SizedBox(height: 300),
-                    Center(child: CircularProgressIndicator()),
-                  ],
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF6366F1),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'Loading listings...',
+                        style: TextStyle(
+                          color: Color(0xFF6B7280),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               : provider.listings.isEmpty
-              ? ListView(
-                  // trick: make it scrollable even when empty
-                  children: const [
-                    SizedBox(height: 300),
-                    Center(child: Text('No listings available.')),
-                  ],
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(60),
+                        ),
+                        child: const Icon(
+                          Icons.inbox_outlined,
+                          size: 60,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        'No listings yet',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1F2937),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Be the first to create a listing!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               : ListView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   itemCount: provider.listings.length,
                   itemBuilder: (context, index) {
                     final listing = provider.listings[index];
