@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
@@ -51,8 +52,8 @@ class _LoginPageState extends State<LoginPage> {
         return; // Check if widget is still mounted before using context
 
       if (response['status'] == 'success') {
-        // Navigate to Home Page
-        Navigator.pushReplacementNamed(context, '/home');
+        // Navigate to Home Page and clear all previous routes
+        Get.offAllNamed('/home');
       } else {
         // Show error message
         ScaffoldMessenger.of(
@@ -155,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushReplacementNamed(context, '/signup');
+                      Get.toNamed('/signup');
                     },
                     child: const Text(
                       'Sign Up',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/services/database_service.dart';
 
@@ -39,8 +40,8 @@ class _HomePageState extends State<HomePage> {
               final dbHelper = DatabaseService();
               dbHelper.logout();
 
-              // Navigate back to login page
-              Navigator.of(context).pushReplacementNamed('/login');
+              // Navigate back to login page and clear all previous routes
+              Get.offAllNamed('/login');
             },
             child: Text("Yes"),
           ),
@@ -63,16 +64,13 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xFFF8FAFC),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(context).pushNamed('/create_listing').then((_) => _getListings());
+          Get.toNamed('/create_listing')!.then((_) => _getListings());
         },
         backgroundColor: const Color(0xFF6366F1),
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text(
           'Create',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
         elevation: 0,
       ),
@@ -110,7 +108,9 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF6366F1),
+                        ),
                       ),
                       SizedBox(height: 16),
                       Text(
@@ -162,7 +162,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   itemCount: provider.listings.length,
                   itemBuilder: (context, index) {
                     final listing = provider.listings[index];

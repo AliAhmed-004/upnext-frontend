@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:upnext/env.dart';
 import 'package:upnext/pages/create_listing_page.dart';
 import 'package:upnext/pages/login_page.dart';
@@ -29,7 +30,7 @@ class UpNext extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Up Next',
       theme: ThemeData(
         useMaterial3: true,
@@ -77,13 +78,14 @@ class UpNext extends StatelessWidget {
           ),
         ),
       ),
-      home: SplashScreen(),
-      routes: {
-        '/login': (context) => const LoginPage(),
-        '/home': (context) => const HomePage(),
-        '/signup': (context) => const SignUpPage(),
-        '/create_listing': (context) => const CreateListingPage(),
-      },
+      initialRoute: '/splash',
+      getPages: [
+        GetPage(name: '/splash', page: () => SplashScreen()),
+        GetPage(name: '/login', page: () => const LoginPage()),
+        GetPage(name: '/home', page: () => const HomePage()),
+        GetPage(name: '/signup', page: () => const SignUpPage()),
+        GetPage(name: '/create_listing', page: () => const CreateListingPage()),
+      ],
     );
   }
 }

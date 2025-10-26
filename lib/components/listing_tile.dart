@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:upnext/env.dart';
 
@@ -48,12 +49,7 @@ class _ListingTileState extends State<ListingTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ListingDetailsPage(listingId: listing.id),
-          ),
-        );
+        Get.to(() => ListingDetailsPage(listingId: listing.id));
       },
       child: Container(
         width: double.infinity,

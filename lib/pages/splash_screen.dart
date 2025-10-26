@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../services/database_service.dart';
 import 'home_page.dart';
 import 'login_page.dart';
@@ -28,15 +29,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
     if (user.isNotEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
+      Get.offAllNamed('/home');
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
+      Get.offAllNamed('/login');
     }
   }
 

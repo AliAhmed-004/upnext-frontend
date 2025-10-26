@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:upnext/services/auth_service.dart';
 
 import '../components/custom_button.dart';
@@ -30,8 +31,8 @@ class SignUpPage extends StatelessWidget {
       final response = await AuthService.signUp(email, password);
 
       if (response['status'] == 'success') {
-        // Navigate to Home Page
-        Navigator.pushReplacementNamed(context, '/home');
+        // Navigate to Home Page and clear all previous routes
+        Get.offAllNamed('/home');
       } else {
         // Show error message
         ScaffoldMessenger.of(
@@ -134,7 +135,8 @@ class SignUpPage extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushReplacementNamed(context, '/login');
+                      // Navigate to Login Page
+                      Get.back();
                     },
                     child: const Text(
                       'Sign In',
