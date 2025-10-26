@@ -67,22 +67,74 @@ class _CreateListingPageState extends State<CreateListingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Listing')),
-      body: Column(
-        children: [
-          CustomTextfield(hintText: "Title", controller: titleController),
-
-          CustomTextfield(
-            hintText: "Description",
-            controller: descriptionController,
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text(
+          'Create Listing',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1F2937),
           ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Share something with the community',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF6B7280),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 32),
 
-          // Create button
-          CustomButton(
-            onPressed: () => createListing(),
-            buttonText: "Create Listing",
+              const Text(
+                'Title',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+              const SizedBox(height: 8),
+              CustomTextfield(
+                hintText: "What's your listing about?",
+                controller: titleController,
+              ),
+              const SizedBox(height: 24),
+
+              const Text(
+                'Description',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+              const SizedBox(height: 8),
+              CustomTextfield(
+                hintText: "Tell us more about it...",
+                controller: descriptionController,
+              ),
+              const SizedBox(height: 40),
+
+              SizedBox(
+                width: double.infinity,
+                child: CustomButton(
+                  onPressed: () => createListing(),
+                  buttonText: "Create Listing",
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
