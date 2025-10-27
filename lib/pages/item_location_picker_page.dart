@@ -3,6 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../env.dart';
+
 class ItemLocationPickerPage extends StatefulWidget {
   const ItemLocationPickerPage({super.key});
 
@@ -30,8 +32,7 @@ class _ItemLocationPickerPageState extends State<ItemLocationPickerPage> {
         children: [
           TileLayer(
             urlTemplate:
-                // TODO: Add the api key to env file
-                'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=Ww4nWHUs4BLQV20sy7zB',
+                'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${Env.mapApiKey}',
 
             userAgentPackageName: 'com.spudbyte.upnext',
           ),
