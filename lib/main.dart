@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:upnext/env.dart';
 import 'package:upnext/pages/create_listing_page.dart';
+import 'package:upnext/pages/item_location_picker_page.dart';
 import 'package:upnext/pages/login_page.dart';
 import 'package:upnext/pages/sign_up_page.dart';
 import 'package:upnext/pages/splash_screen.dart';
@@ -66,7 +67,10 @@ class UpNext extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 16,
+            horizontal: 16,
+          ),
           filled: true,
           fillColor: const Color(0xFFF9FAFB),
         ),
@@ -85,6 +89,10 @@ class UpNext extends StatelessWidget {
         GetPage(name: '/home', page: () => const HomePage()),
         GetPage(name: '/signup', page: () => const SignUpPage()),
         GetPage(name: '/create_listing', page: () => const CreateListingPage()),
+        GetPage(
+          name: '/pick_location',
+          page: () => const ItemLocationPickerPage(),
+        ),
       ],
     );
   }

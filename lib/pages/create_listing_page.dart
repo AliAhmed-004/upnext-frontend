@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:upnext/components/custom_button.dart';
@@ -25,9 +27,12 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
   String? selectedCategory;
 
+  // TODO: default location to be user's current location
+  LatLng selectedLocation = LatLng(33.6844, 73.0479);
+
   @override
   void initState() {
-    super.initState;
+    super.initState();
     _loadUser();
   }
 
@@ -61,7 +66,8 @@ class _CreateListingPageState extends State<CreateListingPage> {
       created_at: createdAt,
       status: status,
       category: selectedCategory ?? 'Other',
-      location: user['location'] ?? 'Unknown',
+      latitude: selectedLocation.latitude,
+      longitude: selectedLocation.longitude,
     );
 
     debugPrint("Created Listing: $listing");
@@ -161,6 +167,27 @@ class _CreateListingPageState extends State<CreateListingPage> {
                   });
                 },
               ),
+              const SizedBox(height: 40),
+
+              // pick location button
+              CustomButton(
+                onPressed: () async {
+                  final result = await Get.toNamed('/pick_location');
+                  if (result != null) {
+                    debugPrint("Selected Location: $result");
+                    setState(() {
+                      selectedLocation = result as LatLng;
+                    });
+                  }
+                },
+                buttonText: "Pick Location",
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Location: (${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)})",
+                style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+              ),
+              const SizedBox(height: 40),
 
               SizedBox(
                 width: double.infinity,

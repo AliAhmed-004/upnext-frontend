@@ -8,7 +8,8 @@ class ListingModel {
   final String created_at;
   final String status;
   final String category;
-  final String location;
+  final double latitude;
+  final double longitude;
 
   ListingModel({
     required this.id,
@@ -18,7 +19,8 @@ class ListingModel {
     required this.created_at,
     required this.status,
     required this.category,
-    required this.location,
+    required this.latitude,
+    required this.longitude,
   });
 
   factory ListingModel.fromMap(Map<String, dynamic> map) {
@@ -30,7 +32,8 @@ class ListingModel {
       created_at: map['created_at'],
       status: map['status'],
       category: map['category'],
-      location: map['location'],
+      latitude: map['latitude'],
+      longitude: map['longitude'],
     );
   }
 
@@ -43,7 +46,8 @@ class ListingModel {
       'created_at': created_at,
       'status': status,
       'category': category,
-      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 }
