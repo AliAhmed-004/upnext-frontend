@@ -23,6 +23,8 @@ class _CreateListingPageState extends State<CreateListingPage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
+  String? selectedCategory;
+
   @override
   void initState() {
     super.initState;
@@ -48,11 +50,18 @@ class _CreateListingPageState extends State<CreateListingPage> {
     debugPrint("Description: $description");
     debugPrint("User ID: ${user['user_id']}");
 
+    final createdAt = DateTime.now().toIso8601String();
+    final status = Status.active.name;
+
     final listing = ListingModel(
       id: const Uuid().v1(),
-      title: title,
       user_id: user['user_id'],
+      title: title,
       description: description,
+      created_at: createdAt,
+      status: status,
+      category: selectedCategory ?? 'Other',
+      location: user['location'] ?? 'Unknown',
     );
 
     debugPrint("Created Listing: $listing");
@@ -105,7 +114,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
               ),
               const SizedBox(height: 8),
               CustomTextfield(
-                hintText: "What's your listing about?",
+                hintText: "What are you offering?",
                 controller: titleController,
               ),
               const SizedBox(height: 24),
@@ -119,11 +128,39 @@ class _CreateListingPageState extends State<CreateListingPage> {
                 ),
               ),
               const SizedBox(height: 8),
+
               CustomTextfield(
                 hintText: "Tell us more about it...",
                 controller: descriptionController,
               ),
               const SizedBox(height: 40),
+
+              // category dropdown
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  labelText: 'Category',
+                  border: OutlineInputBorder(),
+                ),
+                items:
+                    <String>[
+                      'Electronics',
+                      'Furniture',
+                      'Clothing',
+                      'Books',
+                      'Other',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                onChanged: (String? newValue) {
+                  // Handle category selection
+                  setState(() {
+                    selectedCategory = newValue;
+                  });
+                },
+              ),
 
               SizedBox(
                 width: double.infinity,
