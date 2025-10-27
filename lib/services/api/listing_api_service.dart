@@ -44,6 +44,12 @@ class ListingApiService {
 
       if (response.statusCode == 200) {
         return {'status': 200, 'message': "Listing Created Successfully"};
+      } else if (response.statusCode == 400) {
+        debugPrint("Bad Request Creating Listing: ${response.reasonPhrase}");
+        return {'status': 400, 'message': "Bad Request Creating Listing"};
+      } else if (response.statusCode == 500) {
+        debugPrint("Server Error Creating Listing: ${response.reasonPhrase}");
+        return {'status': 500, 'message': "Server Error Creating Listing"};
       } else {
         debugPrint("Error Creating Listing: ${response.reasonPhrase}");
         return {'status': 'error', 'message': "Error Creating Listing"};
