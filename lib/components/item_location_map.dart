@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../env.dart';
+
 class ItemLocationMap extends StatelessWidget {
   final LatLng location;
   const ItemLocationMap({super.key, required this.location});
@@ -23,7 +25,7 @@ class ItemLocationMap extends StatelessWidget {
           TileLayer(
             urlTemplate:
                 // TODO: Add the api key to env file
-                'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=Ww4nWHUs4BLQV20sy7zB',
+                'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${Env.mapApiKey}',
 
             userAgentPackageName: 'com.spudbyte.upnext',
           ),
