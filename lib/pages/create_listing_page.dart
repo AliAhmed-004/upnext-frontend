@@ -28,7 +28,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
   String? selectedCategory;
 
   // TODO: default location to be user's current location
-  LatLng selectedLocation = LatLng(33.6844, 73.0479);
+  LatLng? selectedLocation;
 
   @override
   void initState() {
@@ -58,6 +58,23 @@ class _CreateListingPageState extends State<CreateListingPage> {
     final createdAt = DateTime.now().toIso8601String();
     final status = Status.active.name;
 
+    if (selectedLocation == null) {
+      Get.snackbar(
+        'Location Required',
+        'Please pick a location for the listing.',
+      );
+      return;
+    }
+
+    if (title.isEmpty || description.isEmpty || selectedCategory == null) {
+      Get.snackbar(
+        'Missing Information',
+        'Please fill in all required fields.',
+        backgroundColor: Colors.red[200],
+      );
+      return;
+    }
+
     final listing = ListingModel(
       id: const Uuid().v1(),
       user_id: user['user_id'],
@@ -66,8 +83,8 @@ class _CreateListingPageState extends State<CreateListingPage> {
       created_at: createdAt,
       status: status,
       category: selectedCategory ?? 'Other',
-      latitude: selectedLocation.latitude,
-      longitude: selectedLocation.longitude,
+      latitude: selectedLocation!.latitude,
+      longitude: selectedLocation!.longitude,
     );
 
     debugPrint("Created Listing: $listing");
@@ -75,7 +92,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
     final response = await listingApi.createListing(listing);
 
     if (response['status'] == 200) {
-      Navigator.pop(context);
+      Get.back();
     }
   }
 
@@ -184,7 +201,9 @@ class _CreateListingPageState extends State<CreateListingPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                "Location: (${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)})",
+                selectedLocation != null
+                    ? "Location: (${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)})"
+                    : "No location selected",
                 style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 40),
