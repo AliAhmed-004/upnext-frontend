@@ -24,7 +24,11 @@ class _ItemLocationPickerPageState extends State<ItemLocationPickerPage> {
     // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      Get.snackbar('Location Disabled', 'Please turn on the device\'s GPS.');
+      Get.snackbar(
+        'Location Disabled',
+        'Please turn on the device\'s GPS.',
+        backgroundColor: Colors.red[200],
+      );
       return;
     }
 
@@ -33,13 +37,21 @@ class _ItemLocationPickerPageState extends State<ItemLocationPickerPage> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        Get.snackbar('Permission Denied', 'Location permission is required.');
+        Get.snackbar(
+          'Permission Denied',
+          'Location permission is required.',
+          backgroundColor: Colors.red[200],
+        );
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      Get.snackbar('Permission Denied', 'Please enable location in settings.');
+      Get.snackbar(
+        'Permission Denied',
+        'Please enable location in settings.',
+        backgroundColor: Colors.red[200],
+      );
       return;
     }
 
