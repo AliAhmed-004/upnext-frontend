@@ -7,6 +7,7 @@ import 'package:upnext/pages/item_location_picker_page.dart';
 import 'package:upnext/pages/login_page.dart';
 import 'package:upnext/pages/sign_up_page.dart';
 import 'package:upnext/pages/splash_screen.dart';
+import 'package:upnext/pages/profile_page.dart';
 
 import 'pages/home_page.dart';
 import 'providers/listing_provider.dart';
@@ -92,6 +93,10 @@ class UpNext extends StatelessWidget {
         GetPage(
           name: '/pick_location',
           page: () => const ItemLocationPickerPage(),
+        ),
+        GetPage(
+          name: '/profile',
+          page: () => const ProfilePage(),
         ),
       ],
     );
