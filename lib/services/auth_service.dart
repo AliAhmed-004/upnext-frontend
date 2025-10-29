@@ -36,7 +36,7 @@ class AuthService {
         final dbHelper = DatabaseService();
         await dbHelper.insertUser({
           'user_id': jsonDecode(response.body)['user']['id'],
-          'username': jsonDecode(response.body)['user']['name'],
+          'username': jsonDecode(response.body)['user']['username'],
           'email': jsonDecode(response.body)['user']['email'],
         });
         return {'status': 'success', 'message': 'Sign Up successful'};
