@@ -28,7 +28,9 @@ class SignUpPage extends StatelessWidget {
         return;
       }
 
-      final response = await AuthService.signUp(email, password);
+      final createdAt = DateTime.now().toIso8601String();
+
+      final response = await AuthService.signUp(email, password, createdAt);
 
       if (response['status'] == 'success') {
         // Navigate to Home Page and clear all previous routes
@@ -118,7 +120,10 @@ class SignUpPage extends StatelessWidget {
               // Sign Up Button
               SizedBox(
                 width: double.infinity,
-                child: CustomButton(onPressed: signup, buttonText: 'Create Account'),
+                child: CustomButton(
+                  onPressed: signup,
+                  buttonText: 'Create Account',
+                ),
               ),
               const SizedBox(height: 32),
 
@@ -128,10 +133,7 @@ class SignUpPage extends StatelessWidget {
                 children: [
                   const Text(
                     "Already have an account? ",
-                    style: TextStyle(
-                      color: Color(0xFF6B7280),
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Color(0xFF6B7280), fontSize: 16),
                   ),
                   GestureDetector(
                     onTap: () {

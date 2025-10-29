@@ -9,6 +9,7 @@ class AuthService {
   static Future<Map<String, String>> signUp(
     String email,
     String password,
+    String createdAt,
   ) async {
     try {
       debugPrint('Making API call to sign up <============================');
@@ -20,12 +21,24 @@ class AuthService {
       final response = await http.post(
         Uri.parse('${Env.baseUrl}${Env.signUpApi}'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          'created_at': createdAt,
+        }),
       );
 
       if (response.statusCode == 200) {
         debugPrint('Sign Up successful <============================');
         debugPrint('Response Body: ${response.body}');
+
+        // save the user in Database
+        final dbHelper = DatabaseService();
+        await dbHelper.insertUser({
+          'user_id': jsonDecode(response.body)['user']['id'],
+          'username': jsonDecode(response.body)['user']['name'],
+          'email': jsonDecode(response.body)['user']['email'],
+        });
         return {'status': 'success', 'message': 'Sign Up successful'};
       } else {
         debugPrint('Sign Up failed <============================');
