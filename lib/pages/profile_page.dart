@@ -46,7 +46,9 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Are you sure you want to sign out?"),
-        content: const Text("You will need to sign in again to access your account."),
+        content: const Text(
+          "You will need to sign in again to access your account.",
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -279,27 +281,10 @@ class _ProfileContent extends StatelessWidget {
           child: Column(
             children: [
               ListTile(
-                leading: const Icon(Icons.person_rounded, color: Color(0xFF6366F1)),
-                title: const Text('Name'),
-                subtitle: Text(username?.isNotEmpty == true ? username! : '—'),
-              ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.email_rounded, color: Color(0xFF6366F1)),
-                title: const Text('Email'),
-                subtitle: Text(email ?? '—'),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        Card(
-          child: Column(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.dns_rounded, color: Color(0xFF6366F1)),
+                leading: const Icon(
+                  Icons.dns_rounded,
+                  color: Color(0xFF6366F1),
+                ),
                 title: const Text('Server URL'),
                 subtitle: isEditingServerUrl
                     ? Padding(
@@ -351,7 +336,10 @@ class _ProfileContent extends StatelessWidget {
           child: Column(
             children: [
               ListTile(
-                leading: const Icon(Icons.edit_rounded, color: Color(0xFF6B7280)),
+                leading: const Icon(
+                  Icons.edit_rounded,
+                  color: Color(0xFF6B7280),
+                ),
                 title: const Text('Edit profile'),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () {
@@ -362,7 +350,10 @@ class _ProfileContent extends StatelessWidget {
               ),
               const Divider(height: 1),
               ListTile(
-                leading: const Icon(Icons.logout_rounded, color: Color(0xFFDC2626)),
+                leading: const Icon(
+                  Icons.logout_rounded,
+                  color: Color(0xFFDC2626),
+                ),
                 title: const Text(
                   'Sign out',
                   style: TextStyle(color: Color(0xFFDC2626)),
@@ -412,10 +403,7 @@ class _SignedOutView extends StatelessWidget {
             const Text(
               'Sign in to view your profile details.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0xFF6B7280),
-              ),
+              style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
             ),
             const SizedBox(height: 24),
             SizedBox(
