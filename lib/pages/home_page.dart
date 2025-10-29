@@ -83,17 +83,12 @@ class _HomePageState extends State<HomePage> {
             color: Color(0xFF1F2937),
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: logoutConfirmation,
-            icon: const Icon(Icons.logout_rounded),
-            style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFFF3F4F6),
-              foregroundColor: const Color(0xFF6B7280),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
+        leading: IconButton(
+          onPressed: () {
+            Get.toNamed('/profile');
+          },
+          icon: const Icon(Icons.person_outline_rounded),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
