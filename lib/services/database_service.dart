@@ -29,7 +29,9 @@ class DatabaseService {
         username TEXT NOT NULL,
         full_name TEXT,
         email TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        latitude REAL,
+        longitude REAL
       )
     ''');
   }
@@ -51,10 +53,25 @@ class DatabaseService {
   // USER METHODS
   // ==================================================================
 
-  // Insert a new user
+  // Insert a new user (uses replace if user already exists)
   Future<int> insertUser(Map<String, dynamic> user) async {
     final db = await database;
-    return await db.insert('user', user);
+    return await db.insert(
+      'user',
+      user,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // Update user data
+  Future<int> updateUser(Map<String, dynamic> user) async {
+    final db = await database;
+    return await db.update(
+      'user',
+      user,
+      where: 'user_id = ?',
+      whereArgs: [user['user_id']],
+    );
   }
 
   // Logout: Remove user from database

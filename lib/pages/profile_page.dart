@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:upnext/components/custom_button.dart';
+import 'package:upnext/services/auth_service.dart';
 import 'package:upnext/services/database_service.dart';
-import 'package:upnext/env.dart';
-import 'package:upnext/components/custom_textfield.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -13,411 +14,299 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController serverUrlController = TextEditingController();
-  bool isEditingServerUrl = false;
+  final dbHelper = DatabaseService();
+  Map<String, dynamic> user = {};
+  String? userAddress;
+  bool isLoadingLocation = false;
+
+  String _initialsFrom(String? nameOrEmail) {
+    if (nameOrEmail == null || nameOrEmail.trim().isEmpty) return '?';
+    final String base = nameOrEmail.contains('@')
+        ? nameOrEmail.split('@').first
+        : nameOrEmail;
+    final parts = base.trim().split(RegExp(r"\s+|[_\-.]"));
+    final letters = parts.where((p) => p.isNotEmpty).take(2).map((p) => p[0]);
+    return letters.join().toUpperCase();
+  }
 
   @override
   void initState() {
     super.initState();
-    serverUrlController.text = Env.baseUrl;
+    _getUser();
   }
 
-  @override
-  void dispose() {
-    serverUrlController.dispose();
-    super.dispose();
+  // Get user from database
+  void _getUser() async {
+    final fetchedUser = await dbHelper.getUsers();
+    final currentUser = fetchedUser[0];
+
+    setState(() {
+      user = currentUser;
+    });
+
+    // Fetch address after user (and their coordinates) are loaded
+    final dynamic latRaw = currentUser['latitude'];
+    final dynamic longRaw = currentUser['longitude'];
+
+    final double? lat = latRaw is num
+        ? latRaw.toDouble()
+        : double.tryParse('${latRaw ?? ''}');
+    final double? long = longRaw is num
+        ? longRaw.toDouble()
+        : double.tryParse('${longRaw ?? ''}');
+
+    await _getAddressFromLatLng(lat, long);
   }
 
-  Future<void> _saveServerUrl() async {
-    final newUrl = serverUrlController.text.trim();
-    if (newUrl.isNotEmpty) {
-      await Env.setBaseUrl(newUrl);
-      setState(() {
-        isEditingServerUrl = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Server URL updated successfully')),
-      );
-    }
-  }
-
-  void _logoutConfirmation() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Are you sure you want to sign out?"),
-        content: const Text(
-          "You will need to sign in again to access your account.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await DatabaseService().logout();
-              Get.offAllNamed('/login');
-            },
-            child: const Text("Sign Out"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: Color(0xFF1F2937),
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: FutureBuilder<List<Map<String, dynamic>>>(
-          future: DatabaseService().getUsers(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Color(0xFF6366F1)),
-                ),
-              );
-            }
-
-            if (snapshot.hasError) {
-              return Center(
-                child: Text(
-                  'Something went wrong',
-                  style: TextStyle(
-                    color: Colors.red.shade400,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              );
-            }
-
-            final users = snapshot.data ?? [];
-            if (users.isEmpty) {
-              return _SignedOutView();
-            }
-
-            final user = users.first;
-            return _ProfileContent(
-              user: user,
-              serverUrlController: serverUrlController,
-              isEditingServerUrl: isEditingServerUrl,
-              onEditServerUrl: () {
-                setState(() {
-                  isEditingServerUrl = true;
-                });
-              },
-              onSaveServerUrl: _saveServerUrl,
-              onCancelEdit: () {
-                setState(() {
-                  isEditingServerUrl = false;
-                  serverUrlController.text = Env.baseUrl;
-                });
-              },
-              onLogout: _logoutConfirmation,
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileContent extends StatelessWidget {
-  final Map<String, dynamic> user;
-  final TextEditingController serverUrlController;
-  final bool isEditingServerUrl;
-  final VoidCallback onEditServerUrl;
-  final Future<void> Function() onSaveServerUrl;
-  final VoidCallback onCancelEdit;
-  final VoidCallback onLogout;
-
-  const _ProfileContent({
-    required this.user,
-    required this.serverUrlController,
-    required this.isEditingServerUrl,
-    required this.onEditServerUrl,
-    required this.onSaveServerUrl,
-    required this.onCancelEdit,
-    required this.onLogout,
-  });
-
-  String _initials(String? nameOrEmail) {
-    final source = (nameOrEmail ?? '').trim();
-    if (source.isEmpty) return '?';
-    if (source.contains('@')) {
-      return source.substring(0, 1).toUpperCase();
-    }
-    final parts = source.split(RegExp(r'\s+'));
-    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
-  }
-
-  String _memberSince(String? createdAt) {
-    if (createdAt == null || createdAt.isEmpty) return '—';
+  // Get user address from latitude and longitude
+  Future<void> _getAddressFromLatLng(double? lat, double? long) async {
     try {
-      final dt = DateTime.tryParse(createdAt);
-      if (dt == null) return '—';
-      return DateFormat.yMMMM().format(dt);
-    } catch (_) {
-      return '—';
+      if (lat == null || long == null) {
+        setState(() {
+          userAddress = 'Location not available';
+        });
+        return;
+      }
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        String address =
+            '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.postalCode ?? ''}, ${place.country ?? ''}';
+
+        setState(() {
+          userAddress = address;
+        });
+      }
+
+      debugPrint('Address: $userAddress');
+    } catch (e) {
+      debugPrint('Error in getting address: $e');
+
+      setState(() {
+        userAddress = 'Unable to get address';
+      });
+    }
+  }
+
+  // Check if location is available
+  bool _hasLocation() {
+    final dynamic latRaw = user['latitude'];
+    final dynamic longRaw = user['longitude'];
+    final double? lat = latRaw is num
+        ? latRaw.toDouble()
+        : double.tryParse('${latRaw ?? ''}');
+    final double? long = longRaw is num
+        ? longRaw.toDouble()
+        : double.tryParse('${longRaw ?? ''}');
+    return lat != null && long != null;
+  }
+
+  // Get current location and update user
+  Future<void> _updateLocation() async {
+    setState(() {
+      isLoadingLocation = true;
+    });
+
+    try {
+      // Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          Get.snackbar(
+            'Location Services Disabled',
+            'Please enable location services in your device settings.',
+            backgroundColor: Colors.red[200],
+          );
+        }
+        setState(() {
+          isLoadingLocation = false;
+        });
+        return;
+      }
+
+      // Request location permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            Get.snackbar(
+              'Permission Denied',
+              'Location permission is required to update your location.',
+              backgroundColor: Colors.red[200],
+            );
+          }
+          setState(() {
+            isLoadingLocation = false;
+          });
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Location permissions are permanently denied. Please enable them in settings.',
+              ),
+            ),
+          );
+        }
+        setState(() {
+          isLoadingLocation = false;
+        });
+        return;
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      debugPrint(
+        'Current location: ${position.latitude}, ${position.longitude}',
+      );
+
+      // Update location on backend
+      final result = await AuthService.updateUserLocation(
+        user['user_id'],
+        position.latitude,
+        position.longitude,
+      );
+
+      if (result['status'] == 'success') {
+        // Refresh user data from database
+        _getUser();
+        Get.snackbar(
+          'Location Updated',
+          'Your location has been updated successfully!',
+          backgroundColor: Colors.green[200],
+        );
+      } else {
+        Get.snackbar(
+          'Location Update Failed',
+          result['message'] ?? 'Failed to update location',
+          backgroundColor: Colors.red[200],
+        );
+      }
+    } catch (e) {
+      debugPrint('Error getting location: $e');
+      if (mounted) {
+        Get.snackbar(
+          'Error Updating Location',
+          'Error: ${e.toString()}',
+          backgroundColor: Colors.red[200],
+        );
+      }
+    } finally {
+      setState(() {
+        isLoadingLocation = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final username = (user['full_name'] ?? user['username'] ?? '') as String?;
-    final email = (user['email'] ?? '') as String?;
-    final createdAt = (user['created_at'] ?? '') as String?;
-    final initials = _initials(username?.isNotEmpty == true ? username : email);
+    final username = user['username'];
+    final email = user['email'];
+    final createdAt = user['created_at'];
+    final bool hasLocation = _hasLocation();
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFEEF2FF), Color(0xFFF5F3FF)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 76,
-                height: 76,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF6366F1).withOpacity(0.25),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile')),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 12),
+                  Center(
+                    child: CircleAvatar(
+                      radius: 36,
+                      child: Text(
+                        _initialsFrom(username ?? email),
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                      ),
                     ),
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  initials,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 28,
-                    letterSpacing: 0.5,
                   ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      (username?.isNotEmpty == true ? username! : 'User'),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Text(
+                      username ?? 'User',
                       style: const TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      email ?? '',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF6B7280),
-                      ),
+                  ),
+                  const SizedBox(height: 16),
+                  Card(
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.calendar_today_rounded,
-                          size: 14,
-                          color: Color(0xFF9CA3AF),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Member since ${_memberSince(createdAt)}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF9CA3AF),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.email_outlined),
+                            title: const Text('Email'),
+                            subtitle: Text(email ?? '-'),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        Card(
-          child: Column(
-            children: [
-              ListTile(
-                leading: const Icon(
-                  Icons.dns_rounded,
-                  color: Color(0xFF6366F1),
-                ),
-                title: const Text('Server URL'),
-                subtitle: isEditingServerUrl
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Column(
-                          children: [
-                            CustomTextfield(
-                              hintText: 'Server URL',
-                              controller: serverUrlController,
-                              obscureText: false,
+                          const Divider(height: 0),
+                          ListTile(
+                            leading: const Icon(Icons.event_outlined),
+                            title: const Text('Joined'),
+                            subtitle: Text(createdAt ?? '-'),
+                          ),
+                          const Divider(height: 0),
+                          ListTile(
+                            leading: const Icon(Icons.location_on_outlined),
+                            title: const Text('Address'),
+                            subtitle: Text(
+                              userAddress ??
+                                  (isLoadingLocation
+                                      ? 'Loading...'
+                                      : 'Location not set yet'),
                             ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                  onPressed: onCancelEdit,
-                                  child: const Text('Cancel'),
-                                ),
-                                const SizedBox(width: 8),
-                                ElevatedButton(
-                                  onPressed: onSaveServerUrl,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF6366F1),
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text('Save'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    : Text(Env.baseUrl),
-                trailing: isEditingServerUrl
-                    ? null
-                    : IconButton(
-                        onPressed: onEditServerUrl,
-                        icon: const Icon(Icons.edit_rounded),
+                            trailing: !hasLocation
+                                ? IconButton(
+                                    icon: const Icon(Icons.my_location),
+                                    onPressed: isLoadingLocation ? null : _updateLocation,
+                                  )
+                                : null,
+                          ),
+                        ],
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (!hasLocation)
+                    CustomButton(
+                      onPressed: isLoadingLocation ? null : _updateLocation,
+                      buttonText:
+                          isLoadingLocation ? 'Getting location...' : 'Set My Location',
+                    ),
+                  const SizedBox(height: 12),
+                  CustomButton(
+                    onPressed: () async {
+                      await dbHelper.logout();
+                      if (mounted) {
+                        Get.offAllNamed('/login');
+                      }
+                    },
+                    buttonText: 'Sign Out',
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-
-        const SizedBox(height: 16),
-
-        Card(
-          child: Column(
-            children: [
-              ListTile(
-                leading: const Icon(
-                  Icons.edit_rounded,
-                  color: Color(0xFF6B7280),
-                ),
-                title: const Text('Edit profile'),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Edit profile coming soon')),
-                  );
-                },
-              ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(
-                  Icons.logout_rounded,
-                  color: Color(0xFFDC2626),
-                ),
-                title: const Text(
-                  'Sign out',
-                  style: TextStyle(color: Color(0xFFDC2626)),
-                ),
-                onTap: onLogout,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SignedOutView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3F4F6),
-                borderRadius: BorderRadius.circular(60),
-              ),
-              child: const Icon(
-                Icons.person_off_rounded,
-                size: 60,
-                color: Color(0xFF9CA3AF),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              "You're not signed in",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1F2937),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Sign in to view your profile details.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: 220,
-              child: ElevatedButton(
-                onPressed: () => Get.offAllNamed('/login'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Go to Sign In'),
-              ),
-            ),
-          ],
         ),
       ),
     );

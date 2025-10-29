@@ -32,6 +32,7 @@ class Env {
   // Auth Enpoints
   static final String loginApi = "/users/login";
   static final String signUpApi = "/users/signup";
+  static final String updateLocationApi = "/users/update_location";
 
   // Map api key
   static final String mapApiKey = "Ww4nWHUs4BLQV20sy7zB";
