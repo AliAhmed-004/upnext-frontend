@@ -62,6 +62,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
       Get.snackbar(
         'Location Required',
         'Please pick a location for the listing.',
+        backgroundColor: Colors.red[200],
       );
       return;
     }
