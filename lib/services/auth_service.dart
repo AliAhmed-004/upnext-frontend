@@ -51,9 +51,11 @@ class AuthService {
         debugPrint('Sign Up failed <============================');
         debugPrint('Status Code: ${response.statusCode}');
         debugPrint('Response Body: ${response.body}');
+
+        final responseBody = jsonDecode(response.body);
         return {
           'status': 'error',
-          'message': 'Sign Up failed. Please try again.',
+          'message': responseBody['detail'],
         };
       }
     } catch (error) {
