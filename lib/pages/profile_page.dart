@@ -220,7 +220,13 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _getNumberOfListings() async {}
+  Future<void> _getNumberOfListings() async {
+    final listingApi = ListingApiService();
+    final count = await listingApi.getNumberOfListings(user['user_id']);
+    setState(() {
+      numberOfListings = count;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +332,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       trailing: CustomButton(
                         onPressed: () {
-                          Get.toNamed('/user_listings');
+                          Get.toNamed('/user_listings')?.then((_) => _getNumberOfListings()) ?? _getNumberOfListings();
                         },
                         buttonText: "Manage",
                       ),

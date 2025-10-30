@@ -118,4 +118,24 @@ class ListingApiService {
       return 0;
     }
   }
+
+  Future<bool> deleteListing(String listingId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse("${Env.baseUrl}${Env.deleteListing}/$listingId"),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+      debugPrint(
+        "Failed to delete listing. Status code: ${response.statusCode}",
+      );
+      return false;
+    } catch (e) {
+      debugPrint('Error deleting listing <============================');
+      debugPrint(e.toString());
+      return false;
+    }
+  }
 }

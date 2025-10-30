@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
@@ -10,6 +11,7 @@ import 'package:upnext/components/item_location_map.dart';
 
 import '../env.dart';
 import '../models/listing_model.dart';
+import '../providers/listing_provider.dart';
 
 class ListingDetailsPage extends StatefulWidget {
   final String listingId;
@@ -87,22 +89,9 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
 
   // Delete listing function
   void _deleteListing() async {
-    try {
-      final response = await http.delete(
-        Uri.parse("${Env.baseUrl}${Env.deleteListing}/$listingId"),
-      );
-      if (response.statusCode == 200) {
-        debugPrint("Listing deleted successfully.");
-        if (context.mounted) {
-          Get.back(result: true);
-        }
-      } else {
-        debugPrint(
-          "Failed to delete listing. Status code: ${response.statusCode}",
-        );
-      }
-    } catch (e) {
-      debugPrint("Error deleting listing: $e");
+    final ok = await context.read<ListingProvider>().deleteListing(listingId);
+    if (ok && context.mounted) {
+      Get.back(result: true);
     }
   }
 

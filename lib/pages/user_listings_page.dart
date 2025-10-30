@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:upnext/components/listing_tile.dart';
-import 'package:upnext/models/listing_model.dart';
 import 'package:upnext/services/database_service.dart';
 
-import '../services/api/listing_api_service.dart';
+import '../providers/listing_provider.dart';
 
 class UserListingsPage extends StatefulWidget {
   const UserListingsPage({super.key});
@@ -13,49 +13,52 @@ class UserListingsPage extends StatefulWidget {
 }
 
 class _UserListingsPageState extends State<UserListingsPage> {
-  List<ListingModel>? userListings;
+  String? _userId;
 
   @override
   void initState() {
     super.initState();
-    fetchUserListings();
+    _init();
   }
 
-  // Fetch user listings from API and update state
-  Future<void> fetchUserListings() async {
-    // Fetch the user from database
+  Future<void> _init() async {
     final dbHelper = DatabaseService();
     final fetchedUsers = await dbHelper.getUsers();
     final user = fetchedUsers[0];
-    final userId = user['user_id'];
-
-    final listingApi = ListingApiService();
-    final listings = await listingApi.fetchListingsByUserId(userId);
-
-    setState(() {
-      userListings = listings;
-    });
+    _userId = user['user_id'];
+    if (!mounted) return;
+    await context.read<ListingProvider>().getListingsByUserId(_userId!);
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<ListingProvider>();
+    final listings = provider.userListings;
+    final isLoading = provider.isUserLoading;
+
     return Scaffold(
       appBar: AppBar(title: const Text('My Listings')),
-      body: userListings == null
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : userListings!.isEmpty
-          ? const Center(child: Text('No listings found.'))
-          : ListView.builder(
-              itemCount: userListings!.length,
-              itemBuilder: (context, index) {
-                final listing = userListings![index];
-                return ListingTile(
-                  listingModel: listing,
-                  isFromUserListings: true,
-                  onRefresh: fetchUserListings,
-                );
-              },
-            ),
+          : listings.isEmpty
+              ? const Center(child: Text('No listings found.'))
+              : ListView.builder(
+                  itemCount: listings.length,
+                  itemBuilder: (context, index) {
+                    final listing = listings[index];
+                    return ListingTile(
+                      listingModel: listing,
+                      isFromUserListings: true,
+                      onRefresh: () async {
+                        if (_userId != null) {
+                          await context
+                              .read<ListingProvider>()
+                              .getListingsByUserId(_userId!);
+                        }
+                      },
+                    );
+                  },
+                ),
     );
   }
 }
