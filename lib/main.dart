@@ -10,6 +10,7 @@ import 'package:upnext/pages/splash_screen.dart';
 import 'package:upnext/pages/profile_page.dart';
 
 import 'pages/home_page.dart';
+import 'pages/user_listings_page.dart';
 import 'providers/listing_provider.dart';
 
 void main() async {
@@ -94,10 +95,8 @@ class UpNext extends StatelessWidget {
           name: '/pick_location',
           page: () => const ItemLocationPickerPage(),
         ),
-        GetPage(
-          name: '/profile',
-          page: () => const ProfilePage(),
-        ),
+        GetPage(name: '/profile', page: () => const ProfilePage()),
+        GetPage(name: '/user_listings', page: () => const UserListingsPage()),
       ],
     );
   }

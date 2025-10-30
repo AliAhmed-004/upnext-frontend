@@ -3,6 +3,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:upnext/components/custom_button.dart';
+import 'package:upnext/services/api/listing_api_service.dart';
 import 'package:upnext/services/auth_service.dart';
 import 'package:upnext/services/database_service.dart';
 
@@ -19,6 +20,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String? userAddress;
   bool isLoadingLocation = false;
 
+  int? numberOfListings;
+
   String _initialsFrom(String? nameOrEmail) {
     if (nameOrEmail == null || nameOrEmail.trim().isEmpty) return '?';
     final String base = nameOrEmail.contains('@')
@@ -32,11 +35,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _getUser();
+    _getUserInfo();
+    _getNumberOfListings();
   }
 
   // Get user from database
-  void _getUser() async {
+  void _getUserInfo() async {
     final fetchedUser = await dbHelper.getUsers();
     final currentUser = fetchedUser[0];
 
@@ -56,6 +60,16 @@ class _ProfilePageState extends State<ProfilePage> {
         : double.tryParse('${longRaw ?? ''}');
 
     await _getAddressFromLatLng(lat, long);
+
+    // Fetch number of listings
+    debugPrint('Fetching number of listings for user ${user['user_id']}');
+    final listingApi = ListingApiService();
+
+    final count = await listingApi.getNumberOfListings(user['user_id']);
+
+    setState(() {
+      numberOfListings = count;
+    });
   }
 
   // Get user address from latitude and longitude
@@ -177,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (result['status'] == 'success') {
         // Refresh user data from database
-        _getUser();
+        _getUserInfo();
         Get.snackbar(
           'Location Updated',
           'Your location has been updated successfully!',
@@ -206,6 +220,8 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _getNumberOfListings() async {}
+
   @override
   Widget build(BuildContext context) {
     final username = user['username'];
@@ -230,7 +246,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       radius: 36,
                       child: Text(
                         _initialsFrom(username ?? email),
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -278,7 +297,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             trailing: !hasLocation
                                 ? IconButton(
                                     icon: const Icon(Icons.my_location),
-                                    onPressed: isLoadingLocation ? null : _updateLocation,
+                                    onPressed: isLoadingLocation
+                                        ? null
+                                        : _updateLocation,
                                   )
                                 : null,
                           ),
@@ -286,12 +307,39 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
+
+                  SizedBox(height: 16),
+
+                  Card(
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: const EdgeInsets.only(top: 16.0),
+                    child: ListTile(
+                      leading: const Icon(Icons.list_alt_outlined),
+                      title: const Text('Number of Listings'),
+                      subtitle: Text(
+                        numberOfListings != null
+                            ? '$numberOfListings'
+                            : 'Loading...',
+                      ),
+                      trailing: CustomButton(
+                        onPressed: () {
+                          Get.toNamed('/user_listings');
+                        },
+                        buttonText: "Manage",
+                      ),
+                    ),
+                  ),
+
                   const SizedBox(height: 16),
                   if (!hasLocation)
                     CustomButton(
                       onPressed: isLoadingLocation ? null : _updateLocation,
-                      buttonText:
-                          isLoadingLocation ? 'Getting location...' : 'Set My Location',
+                      buttonText: isLoadingLocation
+                          ? 'Getting location...'
+                          : 'Set My Location',
                     ),
                   const SizedBox(height: 12),
                   CustomButton(

@@ -31,6 +31,33 @@ class ListingApiService {
     }
   }
 
+  // Fetch listing by user ID
+  Future<List<ListingModel>> fetchListingsByUserId(String userId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${Env.baseUrl}${Env.getListingsByUser}?user_id=$userId'),
+      );
+
+      if (response.statusCode == 200) {
+        final List data = jsonDecode(response.body);
+
+        return data.map((e) => ListingModel.fromMap(e)).toList();
+      } else {
+        throw Exception(
+          'Failed to load listings for user $userId: ${response.statusCode}: ${response.reasonPhrase}',
+        );
+      }
+    } catch (error) {
+      debugPrint(
+        'Error fetching listings by user ID <============================',
+      );
+      debugPrint(error.toString());
+
+      return [];
+    }
+  }
+
+  // Create a new listing
   Future<Map<String, dynamic>> createListing(ListingModel listing) async {
     // create a new listing via an API
     try {
@@ -58,6 +85,37 @@ class ListingApiService {
       debugPrint('Error creating listing <============================');
       debugPrint(error.toString());
       return {'status': 'error'};
+    }
+  }
+
+  Future<int> getNumberOfListings(String userId) async {
+    // get the number of listings for a specific user
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '${Env.baseUrl}${Env.getNumberOfListingsOfUser}?user_id=$userId',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        debugPrint('Number of listings for user $userId: ${data['count']}');
+
+        return data['count'];
+      } else {
+        debugPrint(
+          'Failed to get number of listings: ${response.statusCode}: ${response.reasonPhrase}',
+        );
+
+        return 0;
+      }
+    } catch (error) {
+      debugPrint(
+        'Error fetching number of listings <============================',
+      );
+      debugPrint(error.toString());
+
+      return 0;
     }
   }
 }
