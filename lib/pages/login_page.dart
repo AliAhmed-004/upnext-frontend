@@ -46,6 +46,24 @@ class _LoginPageState extends State<LoginPage> {
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
 
+      if (email.isEmpty || password.isEmpty) {
+        Get.snackbar(
+          'Validation Error',
+          'Please fill in all fields',
+          backgroundColor: Colors.red[200],
+        );
+        return;
+      }
+
+      if (!email.contains('@')) {
+        Get.snackbar(
+          'Validation Error',
+          'Please enter a valid email address',
+          backgroundColor: Colors.red[200],
+        );
+        return;
+      }
+      
       final response = await AuthService.login(email, password);
 
       if (!mounted)
@@ -56,9 +74,11 @@ class _LoginPageState extends State<LoginPage> {
         Get.offAllNamed('/home');
       } else {
         // Show error message
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(response['message']!)));
+        Get.snackbar(
+          'Login Failed',
+          response['message'] ?? 'Please try again.',
+          backgroundColor: Colors.red[200],
+        );
       }
     }
 

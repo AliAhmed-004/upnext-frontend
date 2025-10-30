@@ -19,12 +19,32 @@ class SignUpPage extends StatelessWidget {
       final email = emailController.text.trim();
       final confirmPassword = confirmPasswordController.text.trim();
 
+      if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+        Get.snackbar(
+          'Validation Error',
+          'Please fill in all fields',
+          backgroundColor: Colors.red[200],
+        );
+        return;
+      }
+
+      if (!email.contains('@')) {
+        Get.snackbar(
+          'Validation Error',
+          'Please enter a valid email address',
+          backgroundColor: Colors.red[200],
+        );
+        return;
+      }
+      
       if (password != confirmPassword) {
         // Show error message
         print('Passwords do not match');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Passwords do not match')));
+        Get.snackbar(
+          'Validation Error',
+          'Passwords do not match',
+          backgroundColor: Colors.red[200],
+        );
         return;
       }
 
@@ -37,9 +57,11 @@ class SignUpPage extends StatelessWidget {
         Get.offAllNamed('/home');
       } else {
         // Show error message
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(response['message']!)));
+        Get.snackbar(
+          'Sign Up Failed',
+          response['message'] ?? 'Please try again.',
+          backgroundColor: Colors.red[200],
+        );
       }
     }
 

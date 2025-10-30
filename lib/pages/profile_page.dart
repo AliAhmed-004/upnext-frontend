@@ -159,12 +159,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Location permissions are permanently denied. Please enable them in settings.',
-              ),
-            ),
+          Get.snackbar(
+            'Permission Permanently Denied',
+            'Please enable location permissions in your device settings.',
+            backgroundColor: Colors.red[200],
           );
         }
         setState(() {
