@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
         ),
         leading: IconButton(
           onPressed: () {
-            Get.toNamed('/profile');
+            Get.toNamed('/profile')!.then((_) => _getListings());
           },
           icon: const Icon(Icons.person_outline_rounded),
         ),
@@ -184,7 +184,13 @@ class _HomePageState extends State<HomePage> {
                   itemCount: provider.listings.length,
                   itemBuilder: (context, index) {
                     final listing = provider.listings[index];
-                    return ListingTile(listingModel: listing);
+                    return ListingTile(
+                      listingModel: listing,
+                      isFromUserListings: false,
+                      onRefresh: () async {
+                        await provider.getListings(forceRefresh: true);
+                      },
+                    );
                   },
                 ),
         ),

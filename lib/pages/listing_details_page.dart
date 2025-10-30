@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/item_location_map.dart';
 
 import '../env.dart';
@@ -12,7 +13,13 @@ import '../models/listing_model.dart';
 
 class ListingDetailsPage extends StatefulWidget {
   final String listingId;
-  const ListingDetailsPage({super.key, required this.listingId});
+  final bool isFromUserListings;
+
+  const ListingDetailsPage({
+    super.key,
+    required this.listingId,
+    required this.isFromUserListings,
+  });
 
   @override
   State<ListingDetailsPage> createState() => _ListingDetailsPageState();
@@ -76,6 +83,27 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
       isoDate,
     ).toLocal(); // convert from UTC if needed
     return DateFormat('MMM d, y – h:mm a').format(dateTime);
+  }
+
+  // Delete listing function
+  void _deleteListing() async {
+    try {
+      final response = await http.delete(
+        Uri.parse("${Env.baseUrl}${Env.deleteListing}/$listingId"),
+      );
+      if (response.statusCode == 200) {
+        debugPrint("Listing deleted successfully.");
+        if (context.mounted) {
+          Get.back(result: true);
+        }
+      } else {
+        debugPrint(
+          "Failed to delete listing. Status code: ${response.statusCode}",
+        );
+      }
+    } catch (e) {
+      debugPrint("Error deleting listing: $e");
+    }
   }
 
   @override
@@ -223,6 +251,14 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
 
               // Map to show where the listing is located
               if (_location != null) ItemLocationMap(location: _location!),
+              const SizedBox(height: 24),
+
+              // Button to delete the listing if it's from user listings
+              if (widget.isFromUserListings)
+                CustomButton(
+                  onPressed: _deleteListing,
+                  buttonText: "Delete Listing",
+                ),
             ],
           ),
         ),

@@ -10,8 +10,15 @@ import '../pages/listing_details_page.dart';
 
 class ListingTile extends StatefulWidget {
   final ListingModel listingModel;
+  final bool isFromUserListings;
+  final Future<void> Function()? onRefresh;
 
-  const ListingTile({super.key, required this.listingModel});
+  const ListingTile({
+    super.key,
+    required this.listingModel,
+    required this.isFromUserListings,
+    this.onRefresh,
+  });
 
   @override
   State<ListingTile> createState() => _ListingTileState();
@@ -49,7 +56,16 @@ class _ListingTileState extends State<ListingTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => ListingDetailsPage(listingId: listing.id));
+        Get.to(
+          () => ListingDetailsPage(
+            listingId: listing.id,
+            isFromUserListings: widget.isFromUserListings,
+          ),
+        )?.then((result) async {
+          if (result == true && widget.onRefresh != null) {
+            await widget.onRefresh!();
+          }
+        });
       },
       child: Container(
         width: double.infinity,

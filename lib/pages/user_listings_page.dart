@@ -49,7 +49,11 @@ class _UserListingsPageState extends State<UserListingsPage> {
               itemCount: userListings!.length,
               itemBuilder: (context, index) {
                 final listing = userListings![index];
-                return ListingTile(listingModel: listing);
+                return ListingTile(
+                  listingModel: listing,
+                  isFromUserListings: true,
+                  onRefresh: fetchUserListings,
+                );
               },
             ),
     );

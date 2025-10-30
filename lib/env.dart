@@ -30,6 +30,7 @@ class Env {
   static final String getListingById = "/listing/get_by_id";
   static final String getListingsByUser = "/listing/get_by_user";
   static final String getNumberOfListingsOfUser = "/listing/number_of_listings";
+  static final String deleteListing = "/listing/delete_listing";
 
   // Auth Enpoints
   static final String loginApi = "/users/login";
