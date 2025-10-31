@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:upnext/components/listing_tile.dart';
-import 'package:upnext/services/database_service.dart';
+import 'package:upnext/providers/user_provider.dart';
 
 import '../providers/listing_provider.dart';
 
@@ -36,9 +36,8 @@ class _HomePageState extends State<HomePage> {
         actions: [
           TextButton(
             onPressed: () {
-              // Remove user from database
-              final dbHelper = DatabaseService();
-              dbHelper.logout();
+              // Remove user from storage
+              context.read<UserProvider>().clearUser();
 
               // Navigate back to login page and clear all previous routes
               Get.offAllNamed('/login');

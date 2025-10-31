@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../services/database_service.dart';
+import 'package:upnext/services/user_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,16 +17,15 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLogin() async {
-    // Check if User is in Database table
-    final dbHelper = DatabaseService();
-    final user = await dbHelper.getUsers();
+    // Check if user is stored
+    final user = await UserService.getCurrentUser();
 
     await Future.delayed(
       const Duration(seconds: 1),
     ); // optional small delay for UX
 
     if (!mounted) return;
-    if (user.isNotEmpty) {
+    if (user != null) {
       Get.offAllNamed('/home');
     } else {
       Get.offAllNamed('/login');

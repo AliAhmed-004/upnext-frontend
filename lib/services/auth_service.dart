@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:upnext/services/database_service.dart';
+import 'package:upnext/services/user_service.dart';
 
 import '../env.dart';
 
@@ -35,9 +35,8 @@ class AuthService {
         final responseBody = jsonDecode(response.body);
         final user = responseBody['user'];
 
-        // save the user in Database
-        final dbHelper = DatabaseService();
-        await dbHelper.insertUser({
+        // Save the user in local storage
+        await UserService.setCurrentUser({
           'user_id': user['id'],
           'username': user['username'],
           'email': user['email'],
@@ -95,10 +94,8 @@ class AuthService {
         final responseData = jsonDecode(response.body);
         final user = responseData['user'];
 
-        // Save the user in Database
-        final dbHelper = DatabaseService();
-
-        await dbHelper.insertUser({
+        // Save the user in local storage
+        await UserService.setCurrentUser({
           'user_id': user['id'],
           'username': user['username'],
           'email': user['email'],
@@ -107,7 +104,7 @@ class AuthService {
           'longitude': user['longitude'],
         });
 
-        debugPrint('User: $user saved in local database');
+        debugPrint('User: $user saved in local storage');
 
         return {'status': 'success', 'message': 'Login successful'};
       } else if (response.statusCode == 401) {
@@ -182,9 +179,8 @@ class AuthService {
         final responseBody = jsonDecode(response.body);
         final updatedUser = responseBody['user'];
 
-        // Update the user in Database
-        final dbHelper = DatabaseService();
-        await dbHelper.updateUser({
+        // Update the user in local storage
+        await UserService.setCurrentUser({
           'user_id': updatedUser['id'],
           'username': updatedUser['username'],
           'email': updatedUser['email'],
@@ -193,7 +189,7 @@ class AuthService {
           'longitude': updatedUser['longitude'],
         });
 
-        debugPrint('User location updated in local database');
+        debugPrint('User location updated in local storage');
 
         return {
           'status': 'success',

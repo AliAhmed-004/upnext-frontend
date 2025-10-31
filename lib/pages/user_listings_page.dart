@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:upnext/components/listing_tile.dart';
-import 'package:upnext/services/database_service.dart';
+import 'package:upnext/providers/user_provider.dart';
 
 import '../providers/listing_provider.dart';
 
@@ -22,10 +22,8 @@ class _UserListingsPageState extends State<UserListingsPage> {
   }
 
   Future<void> _init() async {
-    final dbHelper = DatabaseService();
-    final fetchedUsers = await dbHelper.getUsers();
-    final user = fetchedUsers[0];
-    _userId = user['user_id'];
+    final user = context.read<UserProvider>().user;
+    _userId = user?['user_id'];
     if (!mounted) return;
     await context.read<ListingProvider>().getListingsByUserId(_userId!);
   }

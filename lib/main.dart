@@ -14,6 +14,7 @@ import 'package:upnext/app_themes.dart';
 import 'pages/home_page.dart';
 import 'pages/user_listings_page.dart';
 import 'providers/listing_provider.dart';
+import 'providers/user_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ListingProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()..loadUser()),
       ],
       child: const UpNext(),
     ),

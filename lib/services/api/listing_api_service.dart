@@ -88,6 +88,30 @@ class ListingApiService {
     }
   }
 
+  // Method to book a listing
+  Future<bool> bookListing(String listingId, String userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Env.baseUrl}${Env.bookListing}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'listing_id': listingId, 'user_id': userId}),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        debugPrint(
+          'Failed to book listing: ${response.statusCode}: ${response.reasonPhrase}',
+        );
+        return false;
+      }
+    } catch (error) {
+      debugPrint('Error booking listing <============================');
+      debugPrint(error.toString());
+      return false;
+    }
+  }
+
   Future<int> getNumberOfListings(String userId) async {
     // get the number of listings for a specific user
     try {

@@ -5,8 +5,9 @@ import 'package:get/get.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/services/api/listing_api_service.dart';
 import 'package:upnext/services/auth_service.dart';
-import 'package:upnext/services/database_service.dart';
 import 'package:provider/provider.dart';
+import 'package:upnext/providers/user_provider.dart';
+import 'package:upnext/services/user_service.dart';
 import 'package:upnext/theme_provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -17,7 +18,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final dbHelper = DatabaseService();
   Map<String, dynamic> user = {};
   String? userAddress;
   bool isLoadingLocation = false;
@@ -43,9 +43,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Get user from database
   void _getUserInfo() async {
-    final fetchedUser = await dbHelper.getUsers();
-    final currentUser = fetchedUser[0];
-
+    final provider = context.read<UserProvider>();
+    await provider.loadUser();
+    final currentUser = provider.user;
+    if (currentUser == null) return;
     setState(() {
       user = currentUser;
     });
@@ -66,7 +67,6 @@ class _ProfilePageState extends State<ProfilePage> {
     // Fetch number of listings
     debugPrint('Fetching number of listings for user ${user['user_id']}');
     final listingApi = ListingApiService();
-
     final count = await listingApi.getNumberOfListings(user['user_id']);
 
     setState(() {
@@ -393,7 +393,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
                   CustomButton(
                     onPressed: () async {
-                      await dbHelper.logout();
+                      await context.read<UserProvider>().clearUser();
+                      await UserService.clearCurrentUser();
                       if (mounted) {
                         Get.offAllNamed('/login');
                       }
