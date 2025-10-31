@@ -4,14 +4,19 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:upnext/env.dart';
 import 'package:upnext/models/listing_model.dart';
+import 'package:upnext/services/user_service.dart';
 
 class ListingApiService {
   Future<List<ListingModel>> fetchListings() async {
-    // fetch the listings from an API
+    final user = await UserService.getCurrentUser();
+    if (user == null) {
+      throw Exception('User not found');
+    }
+    final userId = user['user_id'];
     try {
       // Replace with actual endpoint
       final response = await http.get(
-        Uri.parse('${Env.baseUrl}${Env.getListingsApi}'),
+        Uri.parse('${Env.baseUrl}${Env.getListingsApi}?user_id=$userId'),
       );
 
       if (response.statusCode == 200) {

@@ -25,12 +25,13 @@ class Env {
   }
 
   // Listings Endpoints
-  static final String getListingsApi = "/listing/get_all";
+  static final String getListingsApi = "/listing/get_all_except_user";
   static final String createListingApi = "/listing/create";
   static final String getListingById = "/listing/get_by_id";
   static final String getListingsByUser = "/listing/get_by_user";
   static final String getNumberOfListingsOfUser = "/listing/number_of_listings";
   static final String deleteListing = "/listing/delete_listing";
+  static final String bookListing = "/listing/book_listing";
 
   // Auth Enpoints
   static final String loginApi = "/users/login";

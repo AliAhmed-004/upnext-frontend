@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/providers/user_provider.dart';
 
+import '../components/custom_button.dart';
 import '../providers/listing_provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -146,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                                 borderRadius: BorderRadius.circular(60),
                               ),
                               child: const Icon(
-                                Icons.inbox_outlined,
+                                Icons.search_off_outlined,
                                 size: 60,
                                 color: null,
                               ),
@@ -154,19 +155,32 @@ class _HomePageState extends State<HomePage> {
 
                             const SizedBox(height: 24),
                             const Text(
-                              'No listings yet',
+                              'No listings found',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              'Be the first to create a listing!',
+                            Text(
+                              'Other users have not created any listings yet.',
                               style: TextStyle(
                                 fontSize: 16,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
+
+                            // If the user has created listings, allow them to manage them
+                            if (provider.userListings.isNotEmpty) ...[
+                              const SizedBox(height: 24),
+                              Text('... but you have ${provider.userListings.length} listing(s)', style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),),
+                              CustomButton(
+                                onPressed: () {
+                                  Get.toNamed('/user_listings');
+                                },
+                                buttonText: 'Manage my listings',
+                              ),
+                            ]
                           ],
                         ),
                       ),
