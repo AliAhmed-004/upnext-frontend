@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:upnext/services/auth_service.dart';
+import 'package:upnext/providers/user_provider.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
@@ -53,6 +55,8 @@ class SignUpPage extends StatelessWidget {
       final response = await AuthService.signUp(email, password, createdAt);
 
       if (response['status'] == 'success') {
+        // Ensure provider has latest user from storage
+        await context.read<UserProvider>().loadUser();
         // Navigate to Home Page and clear all previous routes
         Get.offAllNamed('/home');
       } else {

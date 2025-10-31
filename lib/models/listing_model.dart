@@ -1,4 +1,4 @@
-enum Status { active, booked, pickedUp }
+enum Status { active, booked, inactive }
 
 class ListingModel {
   final String id;

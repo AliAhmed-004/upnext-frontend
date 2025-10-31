@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
 import '../services/auth_service.dart';
 import '../env.dart';
+import '../providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -70,6 +72,8 @@ class _LoginPageState extends State<LoginPage> {
         return; // Check if widget is still mounted before using context
 
       if (response['status'] == 'success') {
+        // Ensure provider has latest user from storage
+        await context.read<UserProvider>().loadUser();
         // Navigate to Home Page and clear all previous routes
         Get.offAllNamed('/home');
       } else {

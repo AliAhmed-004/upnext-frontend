@@ -8,10 +8,12 @@ import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/item_location_map.dart';
+import 'package:upnext/services/api/listing_api_service.dart';
+import 'package:upnext/providers/listing_provider.dart';
+import 'package:upnext/providers/user_provider.dart';
 
 import '../env.dart';
 import '../models/listing_model.dart';
-import '../providers/listing_provider.dart';
 
 class ListingDetailsPage extends StatefulWidget {
   final String listingId;
@@ -29,6 +31,7 @@ class ListingDetailsPage extends StatefulWidget {
 
 class _ListingDetailsPageState extends State<ListingDetailsPage> {
   late final String listingId;
+  String? _currentUserId;
 
   String _createdBy = "Loading...";
   String _title = "Loading...";
@@ -45,6 +48,12 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
       listingId = widget.listingId;
     });
     _getListingDetails();
+    _loadUserId();
+  }
+
+  void _loadUserId() {
+    final userProvider = context.read<UserProvider>();
+    _currentUserId = userProvider.userId;
   }
 
   // Get the listing details from the API
@@ -92,6 +101,45 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
     final ok = await context.read<ListingProvider>().deleteListing(listingId);
     if (ok && context.mounted) {
       Get.back(result: true);
+    }
+  }
+
+  // Book listing function
+  void _bookListing() async {
+    if (_currentUserId == null) {
+      // try to load user from provider storage first
+      await context.read<UserProvider>().loadUser();
+      _currentUserId = context.read<UserProvider>().userId;
+      if (_currentUserId == null) {
+        Get.snackbar(
+          'Not Logged In',
+          'Please log in to book this item.',
+          backgroundColor: Colors.red[200],
+        );
+        return;
+      }
+    }
+    final ok = await ListingApiService().bookListing(listingId, _currentUserId!);
+    if (!mounted) return;
+    if (ok) {
+      setState(() {
+        _status = Status.booked.name;
+      });
+      // refresh provider feeds so badges update
+      await context.read<ListingProvider>().getListings(forceRefresh: true);
+      Get.snackbar(
+        'Item Booked',
+        'You have successfully booked this item.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green[200],
+      );
+    } else {
+      Get.snackbar(
+        'Booking Failed',
+        'Failed to book this item. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[200],
+      );
     }
   }
 
@@ -189,7 +237,7 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                           ? Theme.of(
                               context,
                             ).colorScheme.primary.withOpacity(0.2)
-                          : _status == Status.pickedUp.name
+                          : _status == Status.inactive.name
                           ? Theme.of(
                               context,
                             ).colorScheme.error.withOpacity(0.18)
@@ -201,7 +249,7 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                       style: TextStyle(
                         color: _status == Status.booked.name
                             ? Theme.of(context).colorScheme.primary
-                            : _status == Status.pickedUp.name
+                            : _status == Status.inactive.name
                             ? Theme.of(context).colorScheme.error
                             : Theme.of(context).colorScheme.secondary,
                         fontWeight: FontWeight.bold,
@@ -253,6 +301,15 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                 CustomButton(
                   onPressed: _deleteListing,
                   buttonText: "Delete Listing",
+                ),
+
+              const SizedBox(height: 16),
+
+              // Button to book the listing if it's not from user listings
+              if (!widget.isFromUserListings)
+                CustomButton(
+                  onPressed: _bookListing,
+                  buttonText: "Book Listing",
                 ),
             ],
           ),
