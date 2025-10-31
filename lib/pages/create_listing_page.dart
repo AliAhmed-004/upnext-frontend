@@ -100,13 +100,14 @@ class _CreateListingPageState extends State<CreateListingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Create Listing',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1F2937),
+            fontSize: 22,
+            color: Theme.of(context).colorScheme.onBackground,
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -118,22 +119,22 @@ class _CreateListingPageState extends State<CreateListingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Share something with the community',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Color(0xFF6B7280),
+                  color: Theme.of(context).colorScheme.secondary,
                   fontWeight: FontWeight.w400,
                 ),
               ),
               const SizedBox(height: 32),
 
-              const Text(
+              Text(
                 'Title',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1F2937),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -143,12 +144,12 @@ class _CreateListingPageState extends State<CreateListingPage> {
               ),
               const SizedBox(height: 24),
 
-              const Text(
+              Text(
                 'Description',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1F2937),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -205,7 +206,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
                 selectedLocation != null
                     ? "Location: (${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)})"
                     : "No location selected",
-                style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.secondary),
               ),
               const SizedBox(height: 40),
 

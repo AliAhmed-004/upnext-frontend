@@ -71,6 +71,7 @@ class _ListingTileState extends State<ListingTile> {
         width: double.infinity,
         margin: const EdgeInsets.only(bottom: 16.0),
         child: Card(
+          color: Theme.of(context).cardColor,
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -82,7 +83,7 @@ class _ListingTileState extends State<ListingTile> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.secondary,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Icon(
@@ -98,13 +99,16 @@ class _ListingTileState extends State<ListingTile> {
                         children: [
                           Text(
                             _userName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF1F2937),
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyLarge?.color,
                               fontSize: 14,
                             ),
                           ),
                           const Text(
+                            // TODO: Replace with actual posting time
                             'Posted recently',
                             style: TextStyle(
                               color: Color(0xFF6B7280),
@@ -114,20 +118,15 @@ class _ListingTileState extends State<ListingTile> {
                         ],
                       ),
                     ),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Color(0xFF9CA3AF),
-                      size: 16,
-                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Text(
                   listing.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1F2937),
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 8),

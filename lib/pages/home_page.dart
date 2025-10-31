@@ -61,12 +61,12 @@ class _HomePageState extends State<HomePage> {
     final provider = context.watch<ListingProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Get.toNamed('/create_listing')!.then((_) => _getListings());
         },
-        backgroundColor: const Color(0xFF6366F1),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text(
           'Create',
@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
-            color: Color(0xFF1F2937),
+            color: null, // inherit
           ),
         ),
         leading: IconButton(
@@ -111,14 +111,14 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF6366F1),
+                                Colors.transparent,
                               ),
                             ),
                             SizedBox(height: 16),
                             Text(
                               'Loading listings...',
                               style: TextStyle(
-                                color: Color(0xFF6B7280),
+                                color: null,
                                 fontSize: 16,
                               ),
                             ),
@@ -143,13 +143,13 @@ class _HomePageState extends State<HomePage> {
                               width: 120,
                               height: 120,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF3F4F6),
+                                color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(60),
                               ),
                               child: const Icon(
                                 Icons.inbox_outlined,
                                 size: 60,
-                                color: Color(0xFF9CA3AF),
+                                color: null,
                               ),
                             ),
 
@@ -159,7 +159,6 @@ class _HomePageState extends State<HomePage> {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF1F2937),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -167,7 +166,6 @@ class _HomePageState extends State<HomePage> {
                               'Be the first to create a listing!',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Color(0xFF6B7280),
                               ),
                             ),
                           ],

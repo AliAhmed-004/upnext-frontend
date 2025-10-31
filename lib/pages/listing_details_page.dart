@@ -98,13 +98,13 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           _title,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1F2937),
+            color: Theme.of(context).colorScheme.onBackground,
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -123,12 +123,14 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withOpacity(0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(24),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.person,
-                      color: Color(0xFF6366F1),
+                      color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
                   ),
@@ -139,9 +141,9 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                       children: [
                         Text(
                           _createdBy,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1F2937),
+                            color: Theme.of(context).colorScheme.onBackground,
                             fontSize: 16,
                           ),
                         ),
@@ -149,8 +151,8 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                         // Created At, formatted
                         Text(
                           "Created at: $_formattedDate",
-                          style: const TextStyle(
-                            color: Color(0xFF6B7280),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
                             fontSize: 14,
                           ),
                         ),
@@ -167,10 +169,10 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                 children: [
                   Text(
                     _title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937),
+                      color: Theme.of(context).colorScheme.onBackground,
                       height: 1.3,
                     ),
                   ),
@@ -184,20 +186,24 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                     ),
                     decoration: BoxDecoration(
                       color: _status == Status.active.name
-                          ? const Color(0xFFD1FAE5)
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.2)
                           : _status == Status.pickedUp.name
-                          ? const Color(0xFFFEE2E2)
-                          : const Color(0xFFF3F4F6),
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.error.withOpacity(0.18)
+                          : Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       _status.toUpperCase(),
                       style: TextStyle(
                         color: _status == Status.booked.name
-                            ? const Color(0xFF065F46)
+                            ? Theme.of(context).colorScheme.primary
                             : _status == Status.pickedUp.name
-                            ? const Color(0xFFB91C1C)
-                            : const Color(0xFF6B7280),
+                            ? Theme.of(context).colorScheme.error
+                            : Theme.of(context).colorScheme.secondary,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -212,15 +218,15 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Text(
                   _description,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF374151),
+                    color: Theme.of(context).colorScheme.onSurface,
                     height: 1.6,
                   ),
                 ),
@@ -230,9 +236,9 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
               // category
               Text(
                 "Category: $_category",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
-                  color: Color(0xFF374151),
+                  color: Theme.of(context).colorScheme.onSurface,
                   height: 1.6,
                 ),
               ),

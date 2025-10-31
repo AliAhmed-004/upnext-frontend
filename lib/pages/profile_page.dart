@@ -6,6 +6,8 @@ import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/services/api/listing_api_service.dart';
 import 'package:upnext/services/auth_service.dart';
 import 'package:upnext/services/database_service.dart';
+import 'package:provider/provider.dart';
+import 'package:upnext/theme_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -232,7 +234,13 @@ class _ProfilePageState extends State<ProfilePage> {
     final email = user['email'];
     final createdAt = user['created_at'];
     final bool hasLocation = _hasLocation();
-
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    ThemeMode mode = themeProvider.themeMode;
+    final List<(String, ThemeMode)> themeChoices = [
+      ('System', ThemeMode.system),
+      ('Light', ThemeMode.light),
+      ('Dark', ThemeMode.dark),
+    ];
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: SafeArea(
@@ -257,7 +265,44 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
+                  // Theme dropdown
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Center(
+                      child: DropdownButton<ThemeMode>(
+                        value: mode,
+                        dropdownColor: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(12),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+                        underline: Container(height: 0),
+                        onChanged: (ThemeMode? value) {
+                          if (value != null) themeProvider.setThemeMode(value);
+                        },
+                        items: themeChoices.map((pair) {
+                          return DropdownMenuItem<ThemeMode>(
+                            value: pair.$2,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  pair.$2 == ThemeMode.system
+                                      ? Icons.phone_android
+                                      : pair.$2 == ThemeMode.light
+                                          ? Icons.light_mode
+                                          : Icons.dark_mode,
+                                  size: 18,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(pair.$1),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
                   Center(
                     child: Text(
                       username ?? 'User',

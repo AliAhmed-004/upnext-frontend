@@ -37,11 +37,12 @@ class _UserListingsPageState extends State<UserListingsPage> {
     final isLoading = provider.isUserLoading;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Listings')),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(title: Text('My Listings', style: TextStyle(color: Theme.of(context).colorScheme.onBackground))),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
           : listings.isEmpty
-              ? const Center(child: Text('No listings found.'))
+              ? Center(child: Text('No listings found.', style: TextStyle(color: Theme.of(context).colorScheme.onBackground)))
               : ListView.builder(
                   itemCount: listings.length,
                   itemBuilder: (context, index) {
