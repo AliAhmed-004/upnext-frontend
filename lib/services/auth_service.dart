@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:upnext/services/user_service.dart';
@@ -6,6 +7,55 @@ import 'package:upnext/services/user_service.dart';
 import '../env.dart';
 
 class AuthService {
+  // Firebase Authentication Methods
+  static Future<Map<String, dynamic>> signupWithFirebase(
+    String email,
+    String password,
+  ) async {
+    try {
+      UserCredential? userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      debugPrint('Firebase Sign Up successful: $userCredential');
+
+      return {'status': 'success', 'userCredential': userCredential};
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Firebase Sign Up error: $e');
+
+      return {
+        'status': 'error',
+        'message': e.message ?? 'An unknown error occurred',
+      };
+    } catch (e) {
+      debugPrint('Firebase Sign Up error: $e');
+      return {'status': 'error', 'message': 'An unknown error occurred $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> loginWithFirebase(
+    String email,
+    String password,
+  ) async {
+    try {
+      UserCredential? userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      debugPrint('Firebase Login successful: $userCredential');
+
+      return {'status': 'success', 'userCredential': userCredential};
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Firebase Login error: $e');
+
+      return {
+        'status': 'error',
+        'message': e.message ?? 'An unknown error occurred',
+      };
+    } catch (e) {
+      debugPrint('Firebase Login error: $e');
+      return {'status': 'error', 'message': 'An unknown error occurred'};
+    }
+  }
+
   static Future<Map<String, String>> signUp(
     String email,
     String password,
@@ -52,10 +102,7 @@ class AuthService {
         debugPrint('Response Body: ${response.body}');
 
         final responseBody = jsonDecode(response.body);
-        return {
-          'status': 'error',
-          'message': responseBody['detail'],
-        };
+        return {'status': 'error', 'message': responseBody['detail']};
       }
     } catch (error) {
       debugPrint(

@@ -65,8 +65,8 @@ class _LoginPageState extends State<LoginPage> {
         );
         return;
       }
-      
-      final response = await AuthService.login(email, password);
+
+      final response = await AuthService.loginWithFirebase(email, password);
 
       if (!mounted)
         return; // Check if widget is still mounted before using context
@@ -103,7 +103,9 @@ class _LoginPageState extends State<LoginPage> {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),

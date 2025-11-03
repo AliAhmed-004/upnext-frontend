@@ -38,7 +38,7 @@ class SignUpPage extends StatelessWidget {
         );
         return;
       }
-      
+
       if (password != confirmPassword) {
         // Show error message
         print('Passwords do not match');
@@ -52,21 +52,37 @@ class SignUpPage extends StatelessWidget {
 
       final createdAt = DateTime.now().toIso8601String();
 
-      final response = await AuthService.signUp(email, password, createdAt);
+      final response = await AuthService.signupWithFirebase(email, password);
 
-      if (response['status'] == 'success') {
-        // Ensure provider has latest user from storage
-        await context.read<UserProvider>().loadUser();
-        // Navigate to Home Page and clear all previous routes
-        Get.offAllNamed('/home');
-      } else {
+      final status = response['status'];
+      final message = response['message'];
+
+      if (status != 'success') {
         // Show error message
         Get.snackbar(
           'Sign Up Failed',
-          response['message'] ?? 'Please try again.',
+          '$message',
           backgroundColor: Colors.red[200],
         );
+        return;
       }
+
+      // Navigate to Home Page and clear all previous routes
+      Get.offAllNamed('/home');
+
+      // if (response['status'] == 'success') {
+      //   // Ensure provider has latest user from storage
+      //   await context.read<UserProvider>().loadUser();
+      //   // Navigate to Home Page and clear all previous routes
+      //   Get.offAllNamed('/home');
+      // } else {
+      //   // Show error message
+      //   Get.snackbar(
+      //     'Sign Up Failed',
+      //     response['message'] ?? 'Please try again.',
+      //     backgroundColor: Colors.red[200],
+      //   );
+      // }
     }
 
     return Scaffold(
@@ -86,7 +102,9 @@ class SignUpPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -159,7 +177,10 @@ class SignUpPage extends StatelessWidget {
                 children: [
                   Text(
                     "Already have an account? ",
-                    style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 16),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                      fontSize: 16,
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {
