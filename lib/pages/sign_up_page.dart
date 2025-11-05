@@ -12,16 +12,21 @@ class SignUpPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final usernameController = TextEditingController();
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
 
     void signup() async {
-      final password = passwordController.text.trim();
+      final username = usernameController.text.trim();
       final email = emailController.text.trim();
+      final password = passwordController.text.trim();
       final confirmPassword = confirmPasswordController.text.trim();
 
-      if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      if (username.isEmpty ||
+          email.isEmpty ||
+          password.isEmpty ||
+          confirmPassword.isEmpty) {
         Get.snackbar(
           'Validation Error',
           'Please fill in all fields',
@@ -50,9 +55,11 @@ class SignUpPage extends StatelessWidget {
         return;
       }
 
-      final createdAt = DateTime.now().toIso8601String();
-
-      final response = await AuthService.signupWithFirebase(email, password);
+      final response = await AuthService.signupWithFirebase(
+        email,
+        password,
+        username,
+      );
 
       final status = response['status'];
       final message = response['message'];
@@ -136,6 +143,14 @@ class SignUpPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 48),
+
+              // Username Text Field
+              CustomTextfield(
+                hintText: 'Username',
+                controller: usernameController,
+                obscureText: false,
+              ),
+              const SizedBox(height: 20),
 
               // Email Text Field
               CustomTextfield(
