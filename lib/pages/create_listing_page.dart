@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
@@ -7,7 +8,6 @@ import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/custom_textfield.dart';
 import 'package:upnext/models/listing_model.dart';
 import 'package:upnext/services/api/listing_api_service.dart';
-import 'package:upnext/services/database_service.dart';
 
 class CreateListingPage extends StatefulWidget {
   const CreateListingPage({super.key});
@@ -19,8 +19,7 @@ class CreateListingPage extends StatefulWidget {
 class _CreateListingPageState extends State<CreateListingPage> {
   final ListingApiService listingApi = ListingApiService();
 
-  final dbHelper = DatabaseService();
-  late final user;
+  late User? user;
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -37,8 +36,15 @@ class _CreateListingPageState extends State<CreateListingPage> {
   }
 
   Future<void> _loadUser() async {
-    final fetchedUser = await dbHelper.getUsers();
-    final currentUser = fetchedUser.first;
+    // Get currently signed in user from Firebase
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      debugPrint("No user is currently signed in.");
+      return;
+    }
+
+    debugPrint("Current User: $currentUser");
 
     setState(() {
       user = currentUser;
@@ -53,7 +59,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
     debugPrint("Title: $title");
     debugPrint("Description: $description");
-    debugPrint("User ID: ${user['user_id']}");
+    debugPrint("User ID: ${user!.uid}");
 
     final createdAt = DateTime.now().toIso8601String();
     final status = Status.active.name;
@@ -78,7 +84,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
     final listing = ListingModel(
       id: const Uuid().v1(),
-      user_id: user['user_id'],
+      user_id: user!.uid,
       title: title,
       description: description,
       created_at: createdAt,
@@ -90,11 +96,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
     debugPrint("Created Listing: $listing");
 
-    final response = await listingApi.createListing(listing);
-
-    if (response['status'] == 200) {
-      Get.back();
-    }
+    // TODO: Store the Listing as Map in Firestore
   }
 
   @override
@@ -206,7 +208,10 @@ class _CreateListingPageState extends State<CreateListingPage> {
                 selectedLocation != null
                     ? "Location: (${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)})"
                     : "No location selected",
-                style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.secondary),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
               ),
               const SizedBox(height: 40),
 
