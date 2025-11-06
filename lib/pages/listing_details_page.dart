@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/item_location_map.dart';
@@ -10,6 +9,7 @@ import 'package:upnext/providers/listing_provider.dart';
 import 'package:upnext/providers/user_provider.dart';
 import 'package:upnext/services/firestore_service.dart';
 
+import '../helper/helper_methods.dart';
 import '../models/listing_model.dart';
 
 class ListingDetailsPage extends StatefulWidget {
@@ -73,13 +73,6 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
     _currentUserId = userProvider.userId;
   }
 
-  String formatIsoDate(String isoDate) {
-    final dateTime = DateTime.parse(
-      isoDate,
-    ).toLocal(); // convert from UTC if needed
-    return DateFormat('MMM d, y – h:mm a').format(dateTime);
-  }
-
   // Book listing function
   void _bookListing() async {
     if (_currentUserId == null) {
@@ -131,7 +124,7 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
           _title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -170,7 +163,7 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                           _createdBy,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                           ),
                         ),
@@ -199,7 +192,7 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                       height: 1.3,
                     ),
                   ),

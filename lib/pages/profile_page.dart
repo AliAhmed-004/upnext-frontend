@@ -7,7 +7,6 @@ import 'package:upnext/services/api/listing_api_service.dart';
 import 'package:upnext/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:upnext/providers/user_provider.dart';
-import 'package:upnext/services/user_service.dart';
 import 'package:upnext/theme_provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -175,7 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       // Get current position
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.medium),
       );
 
       debugPrint(

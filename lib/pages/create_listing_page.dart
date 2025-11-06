@@ -92,7 +92,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         backgroundColor: Colors.transparent,

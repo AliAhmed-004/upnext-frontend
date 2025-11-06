@@ -57,7 +57,7 @@ class _ItemLocationPickerPageState extends State<ItemLocationPickerPage> {
 
     // Get current position
     final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.medium,
+      locationSettings: LocationSettings(accuracy: LocationAccuracy.medium),
     );
 
     final currentLocation = LatLng(position.latitude, position.longitude);
