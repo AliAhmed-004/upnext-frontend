@@ -39,12 +39,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     // Login function
     void login() async {
-      String serverUrl = serverIpController.text.trim();
-      if (serverUrl.isNotEmpty) {
-        // Update the base URL before making the request
-        await Env.setBaseUrl(serverUrl);
-      }
-
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
 
