@@ -1,7 +1,7 @@
 enum Status { active, booked, inactive }
 
 class ListingModel {
-  final String id;
+  final String id; // Firestore ID
   final String title;
   final String user_id;
   final String description;

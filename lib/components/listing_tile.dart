@@ -1,9 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:upnext/env.dart';
 
 import '../models/listing_model.dart';
 import '../pages/listing_details_page.dart';
@@ -32,40 +27,21 @@ class _ListingTileState extends State<ListingTile> {
   void initState() {
     super.initState();
     listing = widget.listingModel;
-    _getListingDetails();
-  }
-
-  void _getListingDetails() async {
-    try {
-      final response = await http.get(
-        Uri.parse("${Env.baseUrl}${Env.getListingById}/${listing.id}"),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        debugPrint("Listing Details Response: $data");
-
-        setState(() => _userName = data['user_name']);
-      }
-    } catch (e) {
-      debugPrint("Error: $e");
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(
-          () => ListingDetailsPage(
-            listingId: listing.id,
-            isFromUserListings: widget.isFromUserListings,
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ListingDetailsPage(
+              isFromUserListings: widget.isFromUserListings,
+              listingId: listing.id,
+            ),
           ),
-        )?.then((result) async {
-          if (result == true && widget.onRefresh != null) {
-            await widget.onRefresh!();
-          }
-        });
+        );
       },
       child: Container(
         width: double.infinity,

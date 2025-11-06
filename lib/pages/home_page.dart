@@ -117,10 +117,7 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(height: 16),
                             Text(
                               'Loading listings...',
-                              style: TextStyle(
-                                color: null,
-                                fontSize: 16,
-                              ),
+                              style: TextStyle(color: null, fontSize: 16),
                             ),
                           ],
                         ),
@@ -173,14 +170,22 @@ class _HomePageState extends State<HomePage> {
                             // If the user has created listings, allow them to manage them
                             if (provider.userListings.isNotEmpty) ...[
                               const SizedBox(height: 24),
-                              Text('... but you have ${provider.userListings.length} listing(s)', style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface),),
+                              Text(
+                                '... but you have ${provider.userListings.length} listing(s)',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ),
                               CustomButton(
                                 onPressed: () {
                                   Get.toNamed('/user_listings');
                                 },
                                 buttonText: 'Manage my listings',
                               ),
-                            ]
+                            ],
                           ],
                         ),
                       ),
@@ -195,6 +200,7 @@ class _HomePageState extends State<HomePage> {
                   itemCount: provider.listings.length,
                   itemBuilder: (context, index) {
                     final listing = provider.listings[index];
+
                     return ListingTile(
                       listingModel: listing,
                       isFromUserListings: false,

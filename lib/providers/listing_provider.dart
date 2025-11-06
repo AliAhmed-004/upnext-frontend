@@ -20,6 +20,11 @@ class ListingProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _listings = await _repo.getListings();
+
+      debugPrint('Listings fetched: ${_listings.length}');
+      for (var listing in _listings) {
+        debugPrint('Listing ID: ${listing.id}, Title: ${listing.title}');
+      }
     } catch (e) {
       debugPrint('Error in ListingProvider getListings: $e');
     } finally {
@@ -39,15 +44,5 @@ class ListingProvider extends ChangeNotifier {
       _isUserLoading = false;
       notifyListeners();
     }
-  }
-
-  Future<bool> deleteListing(String listingId) async {
-    final ok = await _repo.deleteListing(listingId);
-    if (ok) {
-      _listings = _listings.where((l) => l.id != listingId).toList();
-      _userListings = _userListings.where((l) => l.id != listingId).toList();
-      notifyListeners();
-    }
-    return ok;
   }
 }

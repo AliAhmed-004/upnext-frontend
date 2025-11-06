@@ -52,14 +52,91 @@ class FirestoreService {
   }
 
   // Add Listing
-  Future<Map<String, dynamic>> addListing(ListingModel listing) async {
+  Future<Map<String, dynamic>> addListing(
+    Map<String, dynamic> listingData,
+  ) async {
     try {
-      _firestore.collection('listings').add(listing.toMap());
+      // Create the listing and get its ID
+      final result = await _firestore.collection('listings').add(listingData);
+      final listingId = result.id;
 
+      // Update the listing with the generated listingId
+      await _firestore.collection('listings').doc(listingId).update({
+        'id': listingId,
+      });
       return {'status': 'success'};
     } catch (e) {
       debugPrint('Error adding listing: $e');
       return {'status': 'error', 'message': 'An unknown error occurred: $e'};
+    }
+  }
+
+  // Fetch Listings
+  Future<List<ListingModel>> fetchListings() async {
+    try {
+      final querySnapshot = await _firestore.collection('listings').get();
+
+      _listings = querySnapshot.docs
+          .map((doc) => ListingModel.fromMap(doc.data()))
+          .toList();
+
+      for (var doc in querySnapshot.docs) {
+        debugPrint('Fetched listing document ID: ${doc.id}');
+      }
+
+      return _listings;
+    } catch (e) {
+      debugPrint('Error fetching listings: $e');
+      return [];
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchUserById(String userId) async {
+    try {
+      final docSnapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        return data ?? {};
+      } else {
+        debugPrint('No user found with ID: $userId');
+        return {};
+      }
+    } catch (e) {
+      debugPrint('Error fetching user details: $e');
+      return {};
+    }
+  }
+
+  // Fetch Listing by ID
+  Future<ListingModel?> fetchListingById(String listingId) async {
+    try {
+      debugPrint('Fetching listing from FIRESTORE with ID: $listingId');
+
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where('id', isEqualTo: listingId)
+          .get();
+
+      debugPrint('Document ID: ${querySnapshot.docs.first.id}');
+
+      for (var field in querySnapshot.docs) {
+        debugPrint('Fetched listing data: ${field.data()}');
+      }
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final doc = querySnapshot.docs.first;
+        return ListingModel.fromMap(doc.data());
+      } else {
+        debugPrint('No listing found with ID: $listingId');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error fetching listing by ID: $e');
+      return null;
     }
   }
 }

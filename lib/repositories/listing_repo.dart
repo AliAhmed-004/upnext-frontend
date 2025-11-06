@@ -1,5 +1,6 @@
 import 'package:upnext/models/listing_model.dart';
 import 'package:upnext/services/api/listing_api_service.dart';
+import 'package:upnext/services/firestore_service.dart';
 
 class ListingRepo {
   // final db = DatabaseService();
@@ -7,9 +8,10 @@ class ListingRepo {
 
   Future<List<ListingModel>> getListings() async {
     try {
-      final apiListings = await listingApi.fetchListings();
-
-      return apiListings;
+      print('Fetching listings from FirestoreService using repo');
+      final FirestoreService firestoreService = FirestoreService();
+      final listings = await firestoreService.fetchListings();
+      return listings;
     } catch (error) {
       print('Error in ListingRepo getListings: $error');
       return [];

@@ -11,6 +11,7 @@ import 'package:upnext/components/item_location_map.dart';
 import 'package:upnext/services/api/listing_api_service.dart';
 import 'package:upnext/providers/listing_provider.dart';
 import 'package:upnext/providers/user_provider.dart';
+import 'package:upnext/services/firestore_service.dart';
 
 import '../env.dart';
 import '../models/listing_model.dart';
@@ -47,8 +48,28 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
     setState(() {
       listingId = widget.listingId;
     });
-    _getListingDetails();
     _loadUserId();
+
+    getListingDetails();
+  }
+
+  void getListingDetails() async {
+    final FirestoreService firestoreService = FirestoreService();
+    final result = await firestoreService.fetchListingById(listingId);
+
+    final createdBy = result!.user_id;
+    final userData = await firestoreService.fetchUserById(createdBy);
+    final username = userData['username'];
+
+    setState(() {
+      _title = result.title;
+      _description = result.description;
+      _category = result.category;
+      _formattedDate = formatIsoDate(result.created_at);
+      _status = result.status;
+      _location = LatLng(result.latitude, result.longitude);
+      _createdBy = username;
+    });
   }
 
   void _loadUserId() {
@@ -56,52 +77,11 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
     _currentUserId = userProvider.userId;
   }
 
-  // Get the listing details from the API
-  void _getListingDetails() async {
-    try {
-      final response = await http.get(
-        Uri.parse("${Env.baseUrl}${Env.getListingById}/${listingId}"),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        debugPrint("Listing Details Response: $data");
-
-        final listing = data['listings'][0];
-
-        debugPrint("Listing Details: $listing");
-
-        setState(() {
-          _createdBy = data['user_name'];
-          _title = listing['title'];
-          _description = listing['description'];
-          _category = listing['category'];
-          _formattedDate = formatIsoDate(listing['created_at']);
-          _status = listing['status'];
-          _location = LatLng(
-            double.parse(listing['latitude'].toString()),
-            double.parse(listing['longitude'].toString()),
-          );
-        });
-      }
-    } catch (e) {
-      debugPrint("Error: $e");
-    }
-  }
-
   String formatIsoDate(String isoDate) {
     final dateTime = DateTime.parse(
       isoDate,
     ).toLocal(); // convert from UTC if needed
     return DateFormat('MMM d, y – h:mm a').format(dateTime);
-  }
-
-  // Delete listing function
-  void _deleteListing() async {
-    final ok = await context.read<ListingProvider>().deleteListing(listingId);
-    if (ok && context.mounted) {
-      Get.back(result: true);
-    }
   }
 
   // Book listing function
@@ -119,7 +99,10 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
         return;
       }
     }
-    final ok = await ListingApiService().bookListing(listingId, _currentUserId!);
+    final ok = await ListingApiService().bookListing(
+      listingId,
+      _currentUserId!,
+    );
     if (!mounted) return;
     if (ok) {
       setState(() {
@@ -295,15 +278,6 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
               // Map to show where the listing is located
               if (_location != null) ItemLocationMap(location: _location!),
               const SizedBox(height: 24),
-
-              // Button to delete the listing if it's from user listings
-              if (widget.isFromUserListings)
-                CustomButton(
-                  onPressed: _deleteListing,
-                  buttonText: "Delete Listing",
-                ),
-
-              const SizedBox(height: 16),
 
               // Button to book the listing if it's not from user listings
               if (!widget.isFromUserListings)

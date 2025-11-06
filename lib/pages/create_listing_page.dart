@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:upnext/services/firestore_service.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:upnext/components/custom_button.dart';
@@ -19,40 +20,22 @@ class CreateListingPage extends StatefulWidget {
 class _CreateListingPageState extends State<CreateListingPage> {
   final ListingApiService listingApi = ListingApiService();
 
-  late User? user;
-
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
   String? selectedCategory;
 
-  // TODO: default location to be user's current location
   LatLng? selectedLocation;
 
   @override
   void initState() {
     super.initState();
-    _loadUser();
-  }
-
-  Future<void> _loadUser() async {
-    // Get currently signed in user from Firebase
-    final User? currentUser = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      debugPrint("No user is currently signed in.");
-      return;
-    }
-
-    debugPrint("Current User: $currentUser");
-
-    setState(() {
-      user = currentUser;
-    });
   }
 
   // create listing button call
   void createListing() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+
     debugPrint("Creating Listing...");
     final title = titleController.text.trim();
     final description = descriptionController.text.trim();
@@ -82,21 +65,22 @@ class _CreateListingPageState extends State<CreateListingPage> {
       return;
     }
 
-    final listing = ListingModel(
-      id: const Uuid().v1(),
-      user_id: user!.uid,
-      title: title,
-      description: description,
-      created_at: createdAt,
-      status: status,
-      category: selectedCategory ?? 'Other',
-      latitude: selectedLocation!.latitude,
-      longitude: selectedLocation!.longitude,
-    );
+    // Create the listing data
+    final listingData = {
+      'user_id': user.uid,
+      'title': title,
+      'description': description,
+      'created_at': createdAt,
+      'category': selectedCategory ?? 'Other',
+      'status': status,
+      'latitude': selectedLocation!.latitude,
+      'longitude': selectedLocation!.longitude,
+    };
 
-    debugPrint("Created Listing: $listing");
+    final FirestoreService firestoreService = FirestoreService();
+    await firestoreService.addListing(listingData);
 
-    // TODO: Store the Listing as Map in Firestore
+    Get.back();
   }
 
   @override
