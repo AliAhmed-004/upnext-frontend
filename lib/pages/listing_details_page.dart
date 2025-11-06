@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_button.dart';
@@ -13,7 +10,6 @@ import 'package:upnext/providers/listing_provider.dart';
 import 'package:upnext/providers/user_provider.dart';
 import 'package:upnext/services/firestore_service.dart';
 
-import '../env.dart';
 import '../models/listing_model.dart';
 
 class ListingDetailsPage extends StatefulWidget {

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:upnext/services/auth_service.dart';
-import 'package:upnext/providers/user_provider.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';

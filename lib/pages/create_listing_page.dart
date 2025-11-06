@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/services/firestore_service.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/custom_textfield.dart';
