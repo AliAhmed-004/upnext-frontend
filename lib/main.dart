@@ -4,11 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:upnext/env.dart';
 import 'package:upnext/firebase_options.dart';
+import 'package:upnext/pages/auth_page.dart';
 import 'package:upnext/pages/create_listing_page.dart';
 import 'package:upnext/pages/item_location_picker_page.dart';
 import 'package:upnext/pages/login_page.dart';
 import 'package:upnext/pages/sign_up_page.dart';
-import 'package:upnext/pages/splash_screen.dart';
 import 'package:upnext/pages/profile_page.dart';
 import 'package:upnext/theme_provider.dart';
 import 'package:upnext/app_themes.dart';
@@ -50,9 +50,9 @@ class UpNext extends StatelessWidget {
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
       themeMode: themeProvider.themeMode,
-      initialRoute: '/splash',
+      initialRoute: '/auth',
       getPages: [
-        GetPage(name: '/splash', page: () => SplashScreen()),
+        GetPage(name: '/auth', page: () => AuthPage()),
         GetPage(name: '/login', page: () => const LoginPage()),
         GetPage(name: '/home', page: () => const HomePage()),
         GetPage(name: '/signup', page: () => const SignUpPage()),

@@ -62,6 +62,11 @@ class AuthService {
     }
   }
 
+  static Future<void> logoutFromFirebase() async {
+    await FirebaseAuth.instance.signOut();
+    debugPrint('User logged out from Firebase');
+  }
+
   static Future<Map<String, dynamic>> updateUserLocation(
     String userId,
     double latitude,
