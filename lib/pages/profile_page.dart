@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:upnext/components/custom_button.dart';
-import 'package:upnext/services/api/listing_api_service.dart';
+import 'package:upnext/helper/helper_methods.dart';
+import 'package:upnext/models/user_model.dart';
 import 'package:upnext/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:upnext/providers/user_provider.dart';
+import 'package:upnext/services/firestore_service.dart';
 import 'package:upnext/theme_provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -17,11 +17,12 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Map<String, dynamic> user = {};
+  UserModel? user;
   String? userAddress;
-  bool isLoadingLocation = false;
 
   int? numberOfListings;
+
+  bool isLoading = true;
 
   String _initialsFrom(String? nameOrEmail) {
     if (nameOrEmail == null || nameOrEmail.trim().isEmpty) return '?';
@@ -37,76 +38,31 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _getUserInfo();
-    _getNumberOfListings();
   }
 
   // Get user from database
   void _getUserInfo() async {
-    final provider = context.read<UserProvider>();
-    await provider.loadUser();
-    final currentUser = provider.user;
-    if (currentUser == null) return;
-    setState(() {
-      user = currentUser;
-    });
+    setState(() => isLoading = true);
+    final fetchedUser = await FirestoreService().fetchCurrentUserDetails();
 
-    // Fetch address after user (and their coordinates) are loaded
-    final dynamic latRaw = currentUser['latitude'];
-    final dynamic longRaw = currentUser['longitude'];
-
-    final double? lat = latRaw is num
-        ? latRaw.toDouble()
-        : double.tryParse('${latRaw ?? ''}');
-    final double? long = longRaw is num
-        ? longRaw.toDouble()
-        : double.tryParse('${longRaw ?? ''}');
-
-    await _getAddressFromLatLng(lat, long);
-
-    // Fetch number of listings
-    debugPrint('Fetching number of listings for user ${user['user_id']}');
-    final listingApi = ListingApiService();
-    final count = await listingApi.getNumberOfListings(user['user_id']);
+    if (fetchedUser == null) {
+      debugPrint('No user data found.');
+      setState(() => isLoading = false);
+      return;
+    }
 
     setState(() {
-      numberOfListings = count;
+      user = fetchedUser;
+      isLoading = false;
     });
   }
 
   // Get user address from latitude and longitude
-  Future<void> _getAddressFromLatLng(double? lat, double? long) async {
-    try {
-      if (lat == null || long == null) {
-        setState(() {
-          userAddress = 'Location not available';
-        });
-        return;
-      }
-      List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
-        String address =
-            '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.postalCode ?? ''}, ${place.country ?? ''}';
-
-        setState(() {
-          userAddress = address;
-        });
-      }
-
-      debugPrint('Address: $userAddress');
-    } catch (e) {
-      debugPrint('Error in getting address: $e');
-
-      setState(() {
-        userAddress = 'Unable to get address';
-      });
-    }
-  }
 
   // Check if location is available
   bool _hasLocation() {
-    final dynamic latRaw = user['latitude'];
-    final dynamic longRaw = user['longitude'];
+    final dynamic latRaw = user!.latitude;
+    final dynamic longRaw = user!.longitude;
     final double? lat = latRaw is num
         ? latRaw.toDouble()
         : double.tryParse('${latRaw ?? ''}');
@@ -119,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Get current location and update user
   Future<void> _updateLocation() async {
     setState(() {
-      isLoadingLocation = true;
+      isLoading = true;
     });
 
     try {
@@ -134,7 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         }
         setState(() {
-          isLoadingLocation = false;
+          isLoading = false;
         });
         return;
       }
@@ -152,7 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
             );
           }
           setState(() {
-            isLoadingLocation = false;
+            isLoading = false;
           });
           return;
         }
@@ -167,7 +123,7 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         }
         setState(() {
-          isLoadingLocation = false;
+          isLoading = false;
         });
         return;
       }
@@ -180,29 +136,6 @@ class _ProfilePageState extends State<ProfilePage> {
       debugPrint(
         'Current location: ${position.latitude}, ${position.longitude}',
       );
-
-      // Update location on backend
-      final result = await AuthService.updateUserLocation(
-        user['user_id'],
-        position.latitude,
-        position.longitude,
-      );
-
-      if (result['status'] == 'success') {
-        // Refresh user data from database
-        _getUserInfo();
-        Get.snackbar(
-          'Location Updated',
-          'Your location has been updated successfully!',
-          backgroundColor: Colors.green[200],
-        );
-      } else {
-        Get.snackbar(
-          'Location Update Failed',
-          result['message'] ?? 'Failed to update location',
-          backgroundColor: Colors.red[200],
-        );
-      }
     } catch (e) {
       debugPrint('Error getting location: $e');
       if (mounted) {
@@ -214,32 +147,34 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     } finally {
       setState(() {
-        isLoadingLocation = false;
+        isLoading = false;
       });
     }
   }
 
-  Future<void> _getNumberOfListings() async {
-    final listingApi = ListingApiService();
-    final count = await listingApi.getNumberOfListings(user['user_id']);
-    setState(() {
-      numberOfListings = count;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final username = user['username'];
-    final email = user['email'];
-    final createdAt = user['created_at'];
+    if (isLoading || user == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final username = user!.username;
+    final email = user!.email;
+    final createdAt = user!.createdAt!.toDate();
+
+    final formattedDate = formatIsoDate(createdAt.toIso8601String());
+
     final bool hasLocation = _hasLocation();
+
     final themeProvider = Provider.of<ThemeProvider>(context);
     ThemeMode mode = themeProvider.themeMode;
+
     final List<(String, ThemeMode)> themeChoices = [
       ('System', ThemeMode.system),
       ('Light', ThemeMode.light),
       ('Dark', ThemeMode.dark),
     ];
+
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: SafeArea(
@@ -256,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: CircleAvatar(
                       radius: 36,
                       child: Text(
-                        _initialsFrom(username ?? email),
+                        _initialsFrom(username),
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -307,7 +242,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   Center(
                     child: Text(
-                      username ?? 'User',
+                      username,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -327,13 +262,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           ListTile(
                             leading: const Icon(Icons.email_outlined),
                             title: const Text('Email'),
-                            subtitle: Text(email ?? '-'),
+                            subtitle: Text(email),
                           ),
                           const Divider(height: 0),
                           ListTile(
                             leading: const Icon(Icons.event_outlined),
                             title: const Text('Joined'),
-                            subtitle: Text(createdAt ?? '-'),
+                            subtitle: Text(formattedDate),
                           ),
                           const Divider(height: 0),
                           ListTile(
@@ -341,14 +276,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             title: const Text('Address'),
                             subtitle: Text(
                               userAddress ??
-                                  (isLoadingLocation
+                                  (isLoading
                                       ? 'Loading...'
                                       : 'Location not set yet'),
                             ),
                             trailing: !hasLocation
                                 ? IconButton(
                                     icon: const Icon(Icons.my_location),
-                                    onPressed: isLoadingLocation
+                                    onPressed: isLoading
                                         ? null
                                         : _updateLocation,
                                   )
@@ -377,10 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       trailing: CustomButton(
                         onPressed: () {
-                          Get.toNamed(
-                                '/user_listings',
-                              )?.then((_) => _getNumberOfListings()) ??
-                              _getNumberOfListings();
+                          // TODO: handle manage listings
                         },
                         buttonText: "Manage",
                       ),
@@ -390,8 +322,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 16),
                   if (!hasLocation)
                     CustomButton(
-                      onPressed: isLoadingLocation ? null : _updateLocation,
-                      buttonText: isLoadingLocation
+                      onPressed: isLoading ? null : _updateLocation,
+                      buttonText: isLoading
                           ? 'Getting location...'
                           : 'Set My Location',
                     ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:upnext/models/user_model.dart';
 import 'package:upnext/services/firestore_service.dart';
 import 'package:upnext/services/user_service.dart';
 
@@ -20,9 +21,17 @@ class AuthService {
 
       debugPrint('Firebase Sign Up successful: $userCredential');
 
+      // create a UserModel
+      final user = UserModel(
+        username: username,
+        email: email,
+        latitude: null,
+        longitude: null,
+      );
+
       // save the user in Firestore
       final FirestoreService firestoreService = FirestoreService();
-      await firestoreService.addUser(userCredential, username);
+      await firestoreService.addUser(userCredential, user);
 
       return {'status': 'success', 'userCredential': userCredential};
     } on FirebaseAuthException catch (e) {

@@ -93,37 +93,6 @@ class ListingApiService {
     }
   }
 
-  Future<int> getNumberOfListings(String userId) async {
-    // get the number of listings for a specific user
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '${Env.baseUrl}${Env.getNumberOfListingsOfUser}?user_id=$userId',
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        debugPrint('Number of listings for user $userId: ${data['count']}');
-
-        return data['count'];
-      } else {
-        debugPrint(
-          'Failed to get number of listings: ${response.statusCode}: ${response.reasonPhrase}',
-        );
-
-        return 0;
-      }
-    } catch (error) {
-      debugPrint(
-        'Error fetching number of listings <============================',
-      );
-      debugPrint(error.toString());
-
-      return 0;
-    }
-  }
-
   Future<bool> deleteListing(String listingId) async {
     try {
       final response = await http.delete(
@@ -149,10 +118,7 @@ class ListingApiService {
       final response = await http.put(
         Uri.parse('${Env.baseUrl}${Env.bookListing}/$listingId'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'listing_id': listingId,
-          'user_id': userId,
-        }),
+        body: jsonEncode({'listing_id': listingId, 'user_id': userId}),
       );
 
       if (response.statusCode == 200) {

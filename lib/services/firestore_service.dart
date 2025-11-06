@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:upnext/models/listing_model.dart';
+import 'package:upnext/models/user_model.dart';
 
 class FirestoreService {
   // Firestore instance
@@ -20,7 +21,7 @@ class FirestoreService {
   // Add User
   Future<Map<String, dynamic>> addUser(
     UserCredential? user,
-    String username,
+    UserModel userModel,
   ) async {
     try {
       if (user == null) {
@@ -29,6 +30,9 @@ class FirestoreService {
 
       final uid = user.user?.uid;
       final email = user.user?.email;
+      final username = userModel.username;
+      final latitude = userModel.latitude;
+      final longitude = userModel.longitude;
 
       if (uid == null || email == null) {
         return {'status': 'error', 'message': 'User ID or email is null'};
@@ -41,6 +45,8 @@ class FirestoreService {
       await _firestore.collection('users').doc(uid).set({
         'email': email,
         'username': username,
+        'latitude': latitude,
+        'longitude': longitude,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -91,6 +97,40 @@ class FirestoreService {
     }
   }
 
+  // Fetch information about the current user from Firestore
+  Future<UserModel?> fetchCurrentUserDetails() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        debugPrint('No authenticated user found.');
+        return null;
+      }
+
+      final docSnapshot = await _firestore
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+
+      if (docSnapshot.exists) {
+        debugPrint(
+          'Type of createdAt: ${docSnapshot.data()?['createdAt']?.runtimeType}',
+        );
+        final user = UserModel.fromMap(docSnapshot.data()!);
+
+        return user;
+      } else {
+        debugPrint('No user found with ID: ${currentUser.uid}');
+
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error fetching current user details: $e');
+
+      return null;
+    }
+  }
+
+  // Fetch User by ID
   Future<Map<String, dynamic>> fetchUserById(String userId) async {
     try {
       final docSnapshot = await _firestore
