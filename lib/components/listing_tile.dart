@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:upnext/services/firestore_service.dart';
 
 import '../models/listing_model.dart';
 import '../pages/listing_details_page.dart';
@@ -27,6 +28,17 @@ class _ListingTileState extends State<ListingTile> {
   void initState() {
     super.initState();
     listing = widget.listingModel;
+
+    _loadUserName();
+  }
+
+  // get user name from listing user id
+  void _loadUserName() async {
+    final FirestoreService firestoreService = FirestoreService();
+    final userData = await firestoreService.fetchUserById(listing.user_id);
+    setState(() {
+      _userName = userData['username'];
+    });
   }
 
   @override
