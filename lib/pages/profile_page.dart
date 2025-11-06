@@ -275,7 +275,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         dropdownColor: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(12),
                         icon: const Icon(Icons.arrow_drop_down),
-                        style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                         underline: Container(height: 0),
                         onChanged: (ThemeMode? value) {
                           if (value != null) themeProvider.setThemeMode(value);
@@ -289,8 +292,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   pair.$2 == ThemeMode.system
                                       ? Icons.phone_android
                                       : pair.$2 == ThemeMode.light
-                                          ? Icons.light_mode
-                                          : Icons.dark_mode,
+                                      ? Icons.light_mode
+                                      : Icons.dark_mode,
                                   size: 18,
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
@@ -375,7 +378,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       trailing: CustomButton(
                         onPressed: () {
-                          Get.toNamed('/user_listings')?.then((_) => _getNumberOfListings()) ?? _getNumberOfListings();
+                          Get.toNamed(
+                                '/user_listings',
+                              )?.then((_) => _getNumberOfListings()) ??
+                              _getNumberOfListings();
                         },
                         buttonText: "Manage",
                       ),
@@ -392,12 +398,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   const SizedBox(height: 12),
                   CustomButton(
-                    onPressed: () async {
-                      await context.read<UserProvider>().clearUser();
-                      await UserService.clearCurrentUser();
-                      if (mounted) {
-                        Get.offAllNamed('/login');
-                      }
+                    onPressed: () {
+                      AuthService.logoutFromFirebase();
+                      Get.offAllNamed('/login');
                     },
                     buttonText: 'Sign Out',
                   ),
