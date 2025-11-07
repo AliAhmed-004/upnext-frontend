@@ -80,7 +80,13 @@ class FirestoreService {
   // Fetch Listings
   Future<List<ListingModel>> fetchListings() async {
     try {
-      final querySnapshot = await _firestore.collection('listings').get();
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where(
+            'user_id',
+            isNotEqualTo: FirebaseAuth.instance.currentUser?.uid,
+          )
+          .get();
 
       _listings = querySnapshot.docs
           .map((doc) => ListingModel.fromMap(doc.data()))
