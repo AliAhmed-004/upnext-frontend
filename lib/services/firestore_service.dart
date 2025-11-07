@@ -149,6 +149,31 @@ class FirestoreService {
     }
   }
 
+  // Update User Location
+  Future<void> updateUserLocation(double lat, double long) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        debugPrint('No authenticated user found.');
+        return;
+      }
+
+      // Fetch the current user from Firestore
+      final docRef = _firestore.collection('users').doc(currentUser.uid);
+      final docSnapshot = await docRef.get();
+
+      // Update the Location
+      if (docSnapshot.exists) {
+        await docRef.update({'latitude': lat, 'longitude': long});
+        debugPrint('User location updated successfully.');
+      } else {
+        debugPrint('No user found with ID: ${currentUser.uid}');
+      }
+    } catch (e) {
+      debugPrint('Error updating user location: $e');
+    }
+  }
+
   // Fetch information about the current user from Firestore
   Future<UserModel?> fetchCurrentUserDetails() async {
     try {
@@ -164,10 +189,11 @@ class FirestoreService {
           .get();
 
       if (docSnapshot.exists) {
-        debugPrint(
-          'Type of createdAt: ${docSnapshot.data()?['createdAt']?.runtimeType}',
-        );
         final user = UserModel.fromMap(docSnapshot.data()!);
+
+        for (var field in docSnapshot.data()!.entries) {
+          debugPrint('Fetched user data - ${field.key}: ${field.value}');
+        }
 
         return user;
       } else {

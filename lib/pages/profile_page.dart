@@ -46,16 +46,39 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => isLoading = true);
     final fetchedUser = await FirestoreService().fetchCurrentUserDetails();
 
+    // debug print all fields of fetchedUser
+    debugPrint('Fetched user data:');
+    if (fetchedUser != null) {
+      debugPrint('Username: ${fetchedUser.username}');
+      debugPrint('Email: ${fetchedUser.email}');
+      debugPrint('Latitude: ${fetchedUser.latitude}');
+      debugPrint('Longitude: ${fetchedUser.longitude}');
+      debugPrint('CreatedAt: ${fetchedUser.createdAt}');
+    }
+
     if (fetchedUser == null) {
       debugPrint('No user data found.');
-      setState(() => isLoading = false);
+      setState(() {
+        isLoading = false;
+      });
       return;
     }
 
     setState(() {
       user = fetchedUser;
-      isLoading = false;
     });
+
+    // If user has location, get address
+    if (user!.latitude != null && user!.longitude != null) {
+      final address = await getAddressFromLatLng(
+        fetchedUser.latitude!,
+        fetchedUser.longitude!,
+      );
+      setState(() {
+        userAddress = address;
+        isLoading = false;
+      });
+    }
   }
 
   // Check if location is available
@@ -135,6 +158,30 @@ class _ProfilePageState extends State<ProfilePage> {
       debugPrint(
         'Current location: ${position.latitude}, ${position.longitude}',
       );
+
+      // Update user location in Firestore
+      await FirestoreService().updateUserLocation(
+        position.latitude,
+        position.longitude,
+      );
+
+      // Get address from coordinates
+      final address = await getAddressFromLatLng(
+        position.latitude,
+        position.longitude,
+      );
+
+      setState(() {
+        userAddress = address;
+      });
+
+      if (mounted) {
+        Get.snackbar(
+          'Location Updated',
+          'Your location has been updated successfully.',
+          backgroundColor: Colors.green[200],
+        );
+      }
     } catch (e) {
       debugPrint('Error getting location: $e');
       if (mounted) {
