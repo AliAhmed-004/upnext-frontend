@@ -24,6 +24,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool isLoading = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _getUserInfo();
+    _fetchNumberOfListings();
+  }
+
   String _initialsFrom(String? nameOrEmail) {
     if (nameOrEmail == null || nameOrEmail.trim().isEmpty) return '?';
     final String base = nameOrEmail.contains('@')
@@ -32,12 +39,6 @@ class _ProfilePageState extends State<ProfilePage> {
     final parts = base.trim().split(RegExp(r"\s+|[_\-.]"));
     final letters = parts.where((p) => p.isNotEmpty).take(2).map((p) => p[0]);
     return letters.join().toUpperCase();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _getUserInfo();
   }
 
   // Get user from database
@@ -56,8 +57,6 @@ class _ProfilePageState extends State<ProfilePage> {
       isLoading = false;
     });
   }
-
-  // Get user address from latitude and longitude
 
   // Check if location is available
   bool _hasLocation() {
@@ -150,6 +149,14 @@ class _ProfilePageState extends State<ProfilePage> {
         isLoading = false;
       });
     }
+  }
+
+  // Get number of listings
+  void _fetchNumberOfListings() async {
+    final count = await FirestoreService().fetchCurrentUserListingsCount();
+    setState(() {
+      numberOfListings = count;
+    });
   }
 
   @override
@@ -312,7 +319,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       trailing: CustomButton(
                         onPressed: () {
-                          // TODO: handle manage listings
+                          Get.toNamed('/manage_listings');
                         },
                         buttonText: "Manage",
                       ),

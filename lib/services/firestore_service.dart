@@ -103,6 +103,52 @@ class FirestoreService {
     }
   }
 
+  // Fetch Current User's Listings
+  Future<List<ListingModel>> fetchCurrentUserListings() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        debugPrint('No authenticated user found.');
+        return [];
+      }
+
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where('user_id', isEqualTo: currentUser.uid)
+          .get();
+
+      final userListings = querySnapshot.docs
+          .map((doc) => ListingModel.fromMap(doc.data()))
+          .toList();
+
+      return userListings;
+    } catch (e) {
+      debugPrint('Error fetching current user listings: $e');
+      return [];
+    }
+  }
+
+  // Fetch number of Listings of Current User
+  Future<int> fetchCurrentUserListingsCount() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        debugPrint('No authenticated user found.');
+        return 0;
+      }
+
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where('user_id', isEqualTo: currentUser.uid)
+          .get();
+
+      return querySnapshot.docs.length;
+    } catch (e) {
+      debugPrint('Error fetching current user listings count: $e');
+      return 0;
+    }
+  }
+
   // Fetch information about the current user from Firestore
   Future<UserModel?> fetchCurrentUserDetails() async {
     try {
