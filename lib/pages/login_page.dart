@@ -148,14 +148,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
 
-              // Server IP Text Field
-              CustomTextfield(
-                hintText: 'Server IP (optional)',
-                controller: serverIpController,
-                obscureText: false,
-              ),
-              const SizedBox(height: 32),
-
               // Login Button
               SizedBox(
                 width: double.infinity,
