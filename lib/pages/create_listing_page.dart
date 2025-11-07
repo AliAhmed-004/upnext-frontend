@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:upnext/helper/helper_methods.dart';
 import 'package:upnext/services/firestore_service.dart';
 
 import 'package:upnext/components/custom_button.dart';
@@ -189,7 +190,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
               const SizedBox(height: 16),
               Text(
                 selectedLocation != null
-                    ? "Location: (${selectedLocation!.latitude.toStringAsFixed(4)}, ${selectedLocation!.longitude.toStringAsFixed(4)})"
+                    ? "Location: (${getAddressFromLatLng(selectedLocation!.latitude, selectedLocation!.longitude)})"
                     : "No location selected",
                 style: TextStyle(
                   fontSize: 14,
