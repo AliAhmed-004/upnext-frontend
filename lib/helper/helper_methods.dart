@@ -17,7 +17,7 @@ Future<String> getAddressFromLatLng(double? lat, double? long) async {
     if (placemarks.isNotEmpty) {
       Placemark place = placemarks[0];
       String address =
-          '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.postalCode ?? ''}, ${place.country ?? ''}';
+          '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.country ?? ''}';
       return address;
     } else {
       return 'No address available';
