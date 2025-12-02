@@ -8,7 +8,6 @@ import 'package:upnext/services/firestore_service.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/custom_textfield.dart';
 import 'package:upnext/models/listing_model.dart';
-import 'package:upnext/services/api/listing_api_service.dart';
 
 class CreateListingPage extends StatefulWidget {
   const CreateListingPage({super.key});
@@ -18,8 +17,6 @@ class CreateListingPage extends StatefulWidget {
 }
 
 class _CreateListingPageState extends State<CreateListingPage> {
-  final ListingApiService listingApi = ListingApiService();
-
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 

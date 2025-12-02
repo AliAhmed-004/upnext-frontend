@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/item_location_map.dart';
-import 'package:upnext/services/api/listing_api_service.dart';
-import 'package:upnext/providers/listing_provider.dart';
 import 'package:upnext/providers/user_provider.dart';
 import 'package:upnext/services/firestore_service.dart';
 
@@ -75,42 +72,13 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
 
   // Book listing function
   void _bookListing() async {
-    if (_currentUserId == null) {
-      // try to load user from provider storage first
-      await context.read<UserProvider>().loadUser();
-      _currentUserId = context.read<UserProvider>().userId;
-      if (_currentUserId == null) {
-        Get.snackbar(
-          'Not Logged In',
-          'Please log in to book this item.',
-          backgroundColor: Colors.red[200],
-        );
-        return;
-      }
-    }
-    final ok = await ListingApiService().bookListing(
-      listingId,
-      _currentUserId!,
-    );
-    if (!mounted) return;
-    if (ok) {
-      setState(() {
-        _status = Status.booked.name;
-      });
-      // refresh provider feeds so badges update
-      await context.read<ListingProvider>().getListings(forceRefresh: true);
-      Get.snackbar(
-        'Item Booked',
-        'You have successfully booked this item.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green[200],
-      );
-    } else {
-      Get.snackbar(
-        'Booking Failed',
-        'Failed to book this item. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red[200],
+    // TODO: Implement booking functionality with Firebase
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Booking functionality is coming soon.'),
+          backgroundColor: Colors.orange,
+        ),
       );
     }
   }

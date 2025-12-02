@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
 import '../services/auth_service.dart';
-import '../env.dart';
 import '../providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,20 +17,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController serverIpController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize the server IP field with the current base URL
-    serverIpController.text = Env.baseUrl;
-  }
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
-    serverIpController.dispose();
     super.dispose();
   }
 

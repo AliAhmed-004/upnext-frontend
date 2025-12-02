@@ -38,6 +38,7 @@ class _ListingTileState extends State<ListingTile> {
   void _loadUserName() async {
     final FirestoreService firestoreService = FirestoreService();
     final userData = await firestoreService.fetchUserById(listing.user_id);
+    if (!mounted) return;
     setState(() {
       _userName = userData['username'];
     });

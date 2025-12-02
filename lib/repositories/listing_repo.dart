@@ -1,38 +1,38 @@
+import 'package:flutter/material.dart';
 import 'package:upnext/models/listing_model.dart';
-import 'package:upnext/services/api/listing_api_service.dart';
 import 'package:upnext/services/firestore_service.dart';
 
 class ListingRepo {
-  // final db = DatabaseService();
-  final listingApi = ListingApiService();
+  final FirestoreService _firestoreService = FirestoreService();
 
   Future<List<ListingModel>> getListings() async {
     try {
-      print('Fetching listings from FirestoreService using repo');
-      final FirestoreService firestoreService = FirestoreService();
-      final listings = await firestoreService.fetchListings();
+      debugPrint('Fetching listings from FirestoreService using repo');
+      final listings = await _firestoreService.fetchListings();
       return listings;
     } catch (error) {
-      print('Error in ListingRepo getListings: $error');
+      debugPrint('Error in ListingRepo getListings: $error');
       return [];
     }
   }
 
   Future<List<ListingModel>> getListingsByUserId(String userId) async {
     try {
-      final apiListings = await listingApi.fetchListingsByUserId(userId);
-      return apiListings;
+      // Fetch from Firestore for current user's listings
+      final listings = await _firestoreService.fetchCurrentUserListings();
+      return listings;
     } catch (error) {
-      print('Error in ListingRepo getListingsByUserId: $error');
+      debugPrint('Error in ListingRepo getListingsByUserId: $error');
       return [];
     }
   }
 
   Future<bool> deleteListing(String listingId) async {
     try {
-      return await listingApi.deleteListing(listingId);
+      final result = await _firestoreService.deleteListing(listingId);
+      return result['status'] == 'success';
     } catch (error) {
-      print('Error in ListingRepo deleteListing: $error');
+      debugPrint('Error in ListingRepo deleteListing: $error');
       return false;
     }
   }
