@@ -257,4 +257,38 @@ class FirestoreService {
       return null;
     }
   }
+
+  // Delete Listing
+  Future<Map<String, dynamic>> deleteListing(String listingId) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        return {'status': 'error', 'message': 'No authenticated user found'};
+      }
+
+      // First, verify the listing belongs to the current user
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where('id', isEqualTo: listingId)
+          .where('user_id', isEqualTo: currentUser.uid)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return {
+          'status': 'error',
+          'message': 'Listing not found or you do not have permission to delete it'
+        };
+      }
+
+      // Delete the listing
+      final docId = querySnapshot.docs.first.id;
+      await _firestore.collection('listings').doc(docId).delete();
+
+      debugPrint('Listing deleted successfully: $listingId');
+      return {'status': 'success'};
+    } catch (e) {
+      debugPrint('Error deleting listing: $e');
+      return {'status': 'error', 'message': 'An error occurred: $e'};
+    }
+  }
 }

@@ -8,12 +8,14 @@ class ListingTile extends StatefulWidget {
   final ListingModel listingModel;
   final bool isFromUserListings;
   final Future<void> Function()? onRefresh;
+  final VoidCallback? onDelete;
 
   const ListingTile({
     super.key,
     required this.listingModel,
     required this.isFromUserListings,
     this.onRefresh,
+    this.onDelete,
   });
 
   @override
@@ -128,6 +130,22 @@ class _ListingTileState extends State<ListingTile> {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (widget.isFromUserListings && widget.onDelete != null) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        onPressed: widget.onDelete,
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        label: const Text('Delete'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

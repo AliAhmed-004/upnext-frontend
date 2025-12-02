@@ -13,17 +13,72 @@ class ManageListingsPage extends StatefulWidget {
 class _ManageListingsPageState extends State<ManageListingsPage> {
   bool isLoading = true;
   List<ListingModel> listings = [];
+  final FirestoreService _firestoreService = FirestoreService();
 
   // Fetch Listings
   void fetchListings() async {
-    final FirestoreService firestoreService = FirestoreService();
-
-    final fetchedListings = await firestoreService.fetchCurrentUserListings();
+    final fetchedListings = await _firestoreService.fetchCurrentUserListings();
 
     setState(() {
       listings = fetchedListings;
       isLoading = false;
     });
+  }
+
+  // Delete Listing
+  Future<void> _deleteListing(String listingId) async {
+    // Show confirmation dialog
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Listing'),
+          content: const Text(
+            'Are you sure you want to delete this listing? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    setState(() => isLoading = true);
+
+    final result = await _firestoreService.deleteListing(listingId);
+
+    if (result['status'] == 'success') {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Listing deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+      // Refresh the listings
+      fetchListings();
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Failed to delete listing'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -47,6 +102,7 @@ class _ManageListingsPageState extends State<ManageListingsPage> {
                 return ListingTile(
                   listingModel: listing,
                   isFromUserListings: true,
+                  onDelete: () => _deleteListing(listing.id),
                 );
               },
             ),
