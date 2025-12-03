@@ -15,6 +15,25 @@ class FirestoreService {
   List<ListingModel> get listings => _listings;
 
   // ==========================================
+  // Firestore Streams
+  // ==========================================
+
+  // Stream of all listings (excluding current user's)
+  Stream<List<ListingModel>> listingsStream() {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    
+    return _firestore
+        .collection('listings')
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs
+              .where((doc) => doc.data()['user_id'] != currentUserId)
+              .map((doc) => ListingModel.fromMap(doc.data()))
+              .toList();
+        });
+  }
+
+  // ==========================================
   // Firestore Methods
   // ==========================================
 

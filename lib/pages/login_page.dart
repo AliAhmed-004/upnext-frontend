@@ -17,6 +17,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -25,50 +26,54 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // Login function
-    void login() async {
-      String email = emailController.text.trim();
-      String password = passwordController.text.trim();
+  void _login() async {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
 
-      if (email.isEmpty || password.isEmpty) {
-        Get.snackbar(
-          'Validation Error',
-          'Please fill in all fields',
-          backgroundColor: Colors.red[200],
-        );
-        return;
-      }
+    if (email.isEmpty || password.isEmpty) {
+      Get.snackbar(
+        'Validation Error',
+        'Please fill in all fields',
+        backgroundColor: Colors.red[200],
+      );
+      return;
+    }
 
-      if (!email.contains('@')) {
-        Get.snackbar(
-          'Validation Error',
-          'Please enter a valid email address',
-          backgroundColor: Colors.red[200],
-        );
-        return;
-      }
+    if (!email.contains('@')) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter a valid email address',
+        backgroundColor: Colors.red[200],
+      );
+      return;
+    }
 
+    setState(() => _isLoading = true);
+
+    try {
       final response = await AuthService.loginWithFirebase(email, password);
 
-      if (!mounted)
-        return; // Check if widget is still mounted before using context
+      if (!mounted) return;
 
       if (response['status'] == 'success') {
-        // Ensure provider has latest user from storage
         await context.read<UserProvider>().loadUser();
-        // Navigate to Home Page and clear all previous routes
         Get.offAllNamed('/home');
       } else {
-        // Show error message
         Get.snackbar(
           'Login Failed',
           response['message'] ?? 'Please try again.',
           backgroundColor: Colors.red[200],
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -141,7 +146,11 @@ class _LoginPageState extends State<LoginPage> {
               // Login Button
               SizedBox(
                 width: double.infinity,
-                child: CustomButton(onPressed: login, buttonText: 'Sign In'),
+                child: CustomButton(
+                  onPressed: _login,
+                  buttonText: 'Sign In',
+                  isLoading: _isLoading,
+                ),
               ),
               const SizedBox(height: 32),
 

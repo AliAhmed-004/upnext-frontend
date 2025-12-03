@@ -24,6 +24,7 @@ class _ItemLocationPickerPageState extends State<ItemLocationPickerPage> {
     // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      if (!mounted) return;
       Get.snackbar(
         'Location Disabled',
         'Please turn on the device\'s GPS.',

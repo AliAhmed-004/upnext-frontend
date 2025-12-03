@@ -5,65 +5,80 @@ import 'package:upnext/services/auth_service.dart';
 import '../components/custom_button.dart';
 import '../components/custom_textfield.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final usernameController = TextEditingController();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
+  State<SignUpPage> createState() => _SignUpPageState();
+}
 
-    void signup() async {
-      final username = usernameController.text.trim();
-      final email = emailController.text.trim();
-      final password = passwordController.text.trim();
-      final confirmPassword = confirmPasswordController.text.trim();
+class _SignUpPageState extends State<SignUpPage> {
+  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
 
-      if (username.isEmpty ||
-          email.isEmpty ||
-          password.isEmpty ||
-          confirmPassword.isEmpty) {
-        Get.snackbar(
-          'Validation Error',
-          'Please fill in all fields',
-          backgroundColor: Colors.red[200],
-        );
-        return;
-      }
+  @override
+  void dispose() {
+    usernameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
-      if (!email.contains('@')) {
-        Get.snackbar(
-          'Validation Error',
-          'Please enter a valid email address',
-          backgroundColor: Colors.red[200],
-        );
-        return;
-      }
+  void _signup() async {
+    final username = usernameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
 
-      if (password != confirmPassword) {
-        // Show error message
-        print('Passwords do not match');
-        Get.snackbar(
-          'Validation Error',
-          'Passwords do not match',
-          backgroundColor: Colors.red[200],
-        );
-        return;
-      }
+    if (username.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      Get.snackbar(
+        'Validation Error',
+        'Please fill in all fields',
+        backgroundColor: Colors.red[200],
+      );
+      return;
+    }
 
+    if (!email.contains('@')) {
+      Get.snackbar(
+        'Validation Error',
+        'Please enter a valid email address',
+        backgroundColor: Colors.red[200],
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      Get.snackbar(
+        'Validation Error',
+        'Passwords do not match',
+        backgroundColor: Colors.red[200],
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
       final response = await AuthService.signupWithFirebase(
         email,
         password,
         username,
       );
 
+      if (!mounted) return;
+
       final status = response['status'];
       final message = response['message'];
 
       if (status != 'success') {
-        // Show error message
         Get.snackbar(
           'Sign Up Failed',
           '$message',
@@ -72,24 +87,16 @@ class SignUpPage extends StatelessWidget {
         return;
       }
 
-      // Navigate to Home Page and clear all previous routes
       Get.offAllNamed('/home');
-
-      // if (response['status'] == 'success') {
-      //   // Ensure provider has latest user from storage
-      //   await context.read<UserProvider>().loadUser();
-      //   // Navigate to Home Page and clear all previous routes
-      //   Get.offAllNamed('/home');
-      // } else {
-      //   // Show error message
-      //   Get.snackbar(
-      //     'Sign Up Failed',
-      //     response['message'] ?? 'Please try again.',
-      //     backgroundColor: Colors.red[200],
-      //   );
-      // }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -178,8 +185,9 @@ class SignUpPage extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: CustomButton(
-                  onPressed: signup,
+                  onPressed: _signup,
                   buttonText: 'Create Account',
+                  isLoading: _isLoading,
                 ),
               ),
               const SizedBox(height: 32),

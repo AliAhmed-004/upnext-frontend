@@ -23,6 +23,8 @@ class _CreateListingPageState extends State<CreateListingPage> {
   String? selectedCategory;
 
   LatLng? selectedLocation;
+  String? selectedAddress;
+  bool _isCreating = false;
 
   @override
   void initState() {
@@ -62,22 +64,32 @@ class _CreateListingPageState extends State<CreateListingPage> {
       return;
     }
 
-    // Create the listing data
-    final listingData = {
-      'user_id': user.uid,
-      'title': title,
-      'description': description,
-      'created_at': createdAt,
-      'category': selectedCategory ?? 'Other',
-      'status': status,
-      'latitude': selectedLocation!.latitude,
-      'longitude': selectedLocation!.longitude,
-    };
+    setState(() => _isCreating = true);
 
-    final FirestoreService firestoreService = FirestoreService();
-    await firestoreService.addListing(listingData);
+    try {
+      // Create the listing data
+      final listingData = {
+        'user_id': user.uid,
+        'title': title,
+        'description': description,
+        'created_at': createdAt,
+        'category': selectedCategory ?? 'Other',
+        'status': status,
+        'latitude': selectedLocation!.latitude,
+        'longitude': selectedLocation!.longitude,
+      };
 
-    Get.back();
+      final FirestoreService firestoreService = FirestoreService();
+      await firestoreService.addListing(listingData);
+
+      if (mounted) {
+        Get.back();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isCreating = false);
+      }
+    }
   }
 
   @override
@@ -177,9 +189,17 @@ class _CreateListingPageState extends State<CreateListingPage> {
                   final result = await Get.toNamed('/pick_location');
                   if (result != null) {
                     debugPrint("Selected Location: $result");
-                    setState(() {
-                      selectedLocation = result as LatLng;
-                    });
+                    final location = result as LatLng;
+                    final address = await getAddressFromLatLng(
+                      location.latitude,
+                      location.longitude,
+                    );
+                    if (mounted) {
+                      setState(() {
+                        selectedLocation = location;
+                        selectedAddress = address;
+                      });
+                    }
                   }
                 },
                 buttonText: "Pick Location",
@@ -187,7 +207,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
               const SizedBox(height: 16),
               Text(
                 selectedLocation != null
-                    ? "Location: (${getAddressFromLatLng(selectedLocation!.latitude, selectedLocation!.longitude)})"
+                    ? "Location: $selectedAddress"
                     : "No location selected",
                 style: TextStyle(
                   fontSize: 14,
@@ -201,6 +221,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
                 child: CustomButton(
                   onPressed: () => createListing(),
                   buttonText: "Create Listing",
+                  isLoading: _isCreating,
                 ),
               ),
             ],
