@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 
@@ -17,12 +18,13 @@ Future<String> getAddressFromLatLng(double? lat, double? long) async {
     if (placemarks.isNotEmpty) {
       Placemark place = placemarks[0];
       String address =
-          '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.country ?? ''}';
+          '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}';
       return address;
     } else {
       return 'No address available';
     }
   } catch (e) {
+    debugPrint('Error in getAddressFromLatLng: $e');
     return 'Error retrieving address: $e';
   }
 }

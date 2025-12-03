@@ -233,6 +233,40 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
               ),
               const SizedBox(height: 24),
 
+              // Address of the listing
+              FutureBuilder<String>(
+                future: getAddressFromLatLng(
+                  _location?.latitude,
+                  _location?.longitude,
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text(
+                      'Error fetching address',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        height: 1.6,
+                      ),
+                    );
+                  } else {
+                    return Text(
+                      'Address: ${snapshot.data}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        height: 1.6,
+                      ),
+                    );
+                  }
+                },
+              ),
+
+              const SizedBox(height: 24),
+
+
               // category
               Text(
                 "Category: $_category",
