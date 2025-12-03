@@ -10,6 +10,8 @@ class ListingModel {
   final String category;
   final double latitude;
   final double longitude;
+  final String? booked_by; // User ID of who booked it
+  final String? booked_at; // Timestamp when booked
 
   ListingModel({
     required this.id,
@@ -21,6 +23,8 @@ class ListingModel {
     required this.category,
     required this.latitude,
     required this.longitude,
+    this.booked_by,
+    this.booked_at,
   });
 
   factory ListingModel.fromMap(Map<String, dynamic> map) {
@@ -34,6 +38,8 @@ class ListingModel {
       category: map['category'],
       latitude: map['latitude'],
       longitude: map['longitude'],
+      booked_by: map['booked_by'],
+      booked_at: map['booked_at'],
     );
   }
 
@@ -48,6 +54,8 @@ class ListingModel {
       'category': category,
       'latitude': latitude,
       'longitude': longitude,
+      'booked_by': booked_by,
+      'booked_at': booked_at,
     };
   }
 }

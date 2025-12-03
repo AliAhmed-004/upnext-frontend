@@ -21,6 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? userAddress;
 
   int? numberOfListings;
+  int? numberOfBookedItems;
 
   bool isLoading = true;
 
@@ -29,6 +30,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _getUserInfo();
     _fetchNumberOfListings();
+    _fetchNumberOfBookedItems();
   }
 
   String _initialsFrom(String? nameOrEmail) {
@@ -201,9 +203,21 @@ class _ProfilePageState extends State<ProfilePage> {
   // Get number of listings
   void _fetchNumberOfListings() async {
     final count = await FirestoreService().fetchCurrentUserListingsCount();
-    setState(() {
-      numberOfListings = count;
-    });
+    if (mounted) {
+      setState(() {
+        numberOfListings = count;
+      });
+    }
+  }
+
+  // Get number of booked items
+  void _fetchNumberOfBookedItems() async {
+    final count = await FirestoreService().fetchBookedListingsCount();
+    if (mounted) {
+      setState(() {
+        numberOfBookedItems = count;
+      });
+    }
   }
 
   @override
@@ -369,6 +383,29 @@ class _ProfilePageState extends State<ProfilePage> {
                           Get.toNamed('/manage_listings');
                         },
                         buttonText: "Manage",
+                      ),
+                    ),
+                  ),
+
+                  Card(
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: const EdgeInsets.only(top: 16.0),
+                    child: ListTile(
+                      leading: const Icon(Icons.bookmark_outlined),
+                      title: const Text('Booked Items'),
+                      subtitle: Text(
+                        numberOfBookedItems != null
+                            ? '$numberOfBookedItems'
+                            : 'Loading...',
+                      ),
+                      trailing: CustomButton(
+                        onPressed: () {
+                          Get.toNamed('/booked_listings');
+                        },
+                        buttonText: "View",
                       ),
                     ),
                   ),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/item_location_map.dart';
-import 'package:upnext/providers/user_provider.dart';
 import 'package:upnext/services/firestore_service.dart';
 
 import '../helper/helper_methods.dart';
@@ -25,7 +23,6 @@ class ListingDetailsPage extends StatefulWidget {
 
 class _ListingDetailsPageState extends State<ListingDetailsPage> {
   late final String listingId;
-  String? _currentUserId;
 
   String _createdBy = "Loading...";
   String _title = "Loading...";
@@ -38,11 +35,7 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      listingId = widget.listingId;
-    });
-    _loadUserId();
-
+    listingId = widget.listingId;
     getListingDetails();
   }
 
@@ -65,21 +58,40 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
     });
   }
 
-  void _loadUserId() {
-    final userProvider = context.read<UserProvider>();
-    _currentUserId = userProvider.userId;
-  }
-
   // Book listing function
   void _bookListing() async {
-    // TODO: Implement booking functionality with Firebase
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Book Item'),
+        content: const Text('Are you sure you want to book this item?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Book'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final result = await FirestoreService().bookListing(listingId);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Booking functionality is coming soon.'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: result['success'] == true ? Colors.green : Colors.red,
         ),
       );
+      if (result['success'] == true) {
+        // Refresh the listing details to show updated status
+        getListingDetails();
+      }
     }
   }
 
@@ -236,11 +248,34 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
               if (_location != null) ItemLocationMap(location: _location!),
               const SizedBox(height: 24),
 
-              // Button to book the listing if it's not from user listings
-              if (!widget.isFromUserListings)
+              // Button to book the listing if it's not from user listings and status is active
+              if (!widget.isFromUserListings && _status == Status.active.name)
                 CustomButton(
                   onPressed: _bookListing,
-                  buttonText: "Book Listing",
+                  buttonText: "Book Item",
+                ),
+              
+              // Show message if listing is already booked
+              if (!widget.isFromUserListings && _status == Status.booked.name)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Text(
+                        'This item has already been booked',
+                        style: TextStyle(color: Colors.orange, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),

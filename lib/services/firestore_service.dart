@@ -291,4 +291,138 @@ class FirestoreService {
       return {'status': 'error', 'message': 'An error occurred: $e'};
     }
   }
+
+  // Book a listing
+  Future<Map<String, dynamic>> bookListing(String listingId) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        return {'success': false, 'message': 'User not authenticated'};
+      }
+
+      // Get the listing first to verify it's available
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where('id', isEqualTo: listingId)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return {'success': false, 'message': 'Listing not found'};
+      }
+
+      final doc = querySnapshot.docs.first;
+      final listingData = doc.data();
+
+      // Check if user is trying to book their own listing
+      if (listingData['user_id'] == currentUser.uid) {
+        return {'success': false, 'message': 'You cannot book your own listing'};
+      }
+
+      // Check if listing is still active
+      if (listingData['status'] != Status.active.name) {
+        return {'success': false, 'message': 'This listing is no longer available'};
+      }
+
+      // Book the listing
+      await _firestore.collection('listings').doc(doc.id).update({
+        'status': Status.booked.name,
+        'booked_by': currentUser.uid,
+        'booked_at': DateTime.now().toIso8601String(),
+      });
+
+      debugPrint('Listing booked successfully: $listingId');
+      return {'success': true, 'message': 'Listing booked successfully'};
+    } catch (e) {
+      debugPrint('Error booking listing: $e');
+      return {'success': false, 'message': 'Failed to book listing: $e'};
+    }
+  }
+
+  // Cancel a booking (by the person who booked it)
+  Future<Map<String, dynamic>> cancelBooking(String listingId) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        return {'success': false, 'message': 'User not authenticated'};
+      }
+
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where('id', isEqualTo: listingId)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return {'success': false, 'message': 'Listing not found'};
+      }
+
+      final doc = querySnapshot.docs.first;
+      final listingData = doc.data();
+
+      // Verify the current user is the one who booked it
+      if (listingData['booked_by'] != currentUser.uid) {
+        return {'success': false, 'message': 'You did not book this listing'};
+      }
+
+      // Cancel the booking
+      await _firestore.collection('listings').doc(doc.id).update({
+        'status': Status.active.name,
+        'booked_by': FieldValue.delete(),
+        'booked_at': FieldValue.delete(),
+      });
+
+      debugPrint('Booking cancelled successfully: $listingId');
+      return {'success': true, 'message': 'Booking cancelled successfully'};
+    } catch (e) {
+      debugPrint('Error cancelling booking: $e');
+      return {'success': false, 'message': 'Failed to cancel booking: $e'};
+    }
+  }
+
+  // Fetch listings booked by current user
+  Future<List<ListingModel>> fetchBookedListings() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        debugPrint('No authenticated user found.');
+        return [];
+      }
+
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where('booked_by', isEqualTo: currentUser.uid)
+          .where('status', isEqualTo: Status.booked.name)
+          .get();
+
+      final bookedListings = querySnapshot.docs
+          .map((doc) => ListingModel.fromMap(doc.data()))
+          .toList();
+
+      debugPrint('Fetched ${bookedListings.length} booked listings');
+      return bookedListings;
+    } catch (e) {
+      debugPrint('Error fetching booked listings: $e');
+      return [];
+    }
+  }
+
+  // Fetch count of booked listings for current user
+  Future<int> fetchBookedListingsCount() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        return 0;
+      }
+
+      final querySnapshot = await _firestore
+          .collection('listings')
+          .where('booked_by', isEqualTo: currentUser.uid)
+          .where('status', isEqualTo: Status.booked.name)
+          .get();
+
+      return querySnapshot.docs.length;
+    } catch (e) {
+      debugPrint('Error fetching booked listings count: $e');
+      return 0;
+    }
+  }
 }

@@ -9,6 +9,7 @@ class ListingTile extends StatefulWidget {
   final bool isFromUserListings;
   final Future<void> Function()? onRefresh;
   final VoidCallback? onDelete;
+  final VoidCallback? onCancel;
 
   const ListingTile({
     super.key,
@@ -16,6 +17,7 @@ class ListingTile extends StatefulWidget {
     required this.isFromUserListings,
     this.onRefresh,
     this.onDelete,
+    this.onCancel,
   });
 
   @override
@@ -142,6 +144,22 @@ class _ListingTileState extends State<ListingTile> {
                         label: const Text('Delete'),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (widget.onCancel != null) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        onPressed: widget.onCancel,
+                        icon: const Icon(Icons.cancel_outlined, size: 18),
+                        label: const Text('Cancel Booking'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.orange,
                         ),
                       ),
                     ],

@@ -14,6 +14,7 @@ import 'package:upnext/app_themes.dart';
 
 import 'pages/home_page.dart';
 import 'pages/manage_listings_page.dart';
+import 'pages/booked_listings_page.dart';
 import 'pages/user_listings_page.dart';
 import 'providers/listing_provider.dart';
 import 'providers/user_provider.dart';
@@ -63,6 +64,10 @@ class UpNext extends StatelessWidget {
         GetPage(
           name: '/manage_listings',
           page: () => const ManageListingsPage(),
+        ),
+        GetPage(
+          name: '/booked_listings',
+          page: () => const BookedListingsPage(),
         ),
       ],
     );
