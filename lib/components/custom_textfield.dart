@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CustomTextfield extends StatelessWidget {
+class CustomTextfield extends StatefulWidget {
   final String hintText;
   final bool obscureText;
   final TextEditingController controller;
+
   const CustomTextfield({
     super.key,
     required this.hintText,
@@ -12,16 +13,29 @@ class CustomTextfield extends StatelessWidget {
   });
 
   @override
+  State<CustomTextfield> createState() => _CustomTextfieldState();
+}
+
+class _CustomTextfieldState extends State<CustomTextfield> {
+  late bool _obscure;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscure = widget.obscureText;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      obscureText: obscureText,
+      controller: widget.controller,
+      obscureText: _obscure,
       style: TextStyle(
         fontSize: 16,
         color: Theme.of(context).colorScheme.onSurface,
       ),
       decoration: InputDecoration(
-        hintText: hintText,
+        hintText: widget.hintText,
         hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -41,6 +55,20 @@ class CustomTextfield extends StatelessWidget {
         ),
         filled: true,
         fillColor: Theme.of(context).colorScheme.surface,
+
+        // Here’s the magic
+        suffixIcon: widget.obscureText
+            ? IconButton(
+                icon: Icon(
+                  _obscure ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscure = !_obscure;
+                  });
+                },
+              )
+            : null,
       ),
     );
   }
