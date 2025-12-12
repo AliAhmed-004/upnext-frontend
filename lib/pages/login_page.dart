@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         CustomSnackbar.show(
-          title: 'Validation Error',
+          title: 'Incomplete Fields',
           message: 'Please fill in all fields.',
           type: SnackbarType.error,
         ),
@@ -45,8 +45,8 @@ class _LoginPageState extends State<LoginPage> {
     if (!email.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
         CustomSnackbar.show(
-          title: 'Validation Error',
-          message: 'Please fill in all fields.',
+          title: 'Wrong Email Format',
+          message: 'Please enter a valid email address.',
           type: SnackbarType.error,
         ),
       );
@@ -78,8 +78,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() => _isLoading = false);
       }
     }
-  }
-
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(

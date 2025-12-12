@@ -56,6 +56,19 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       debugPrint('Firebase Login error: $e');
 
+      // determine what the error message is (user not found, wrong password, etc.)
+      if (e.code == 'user-not-found') {
+        return {
+          'status': 'error',
+          'message': 'No user found for that email.',
+        };
+      } else if (e.code == 'invalid-credential') {
+        return {
+          'status': 'error',
+          'message': 'Wrong password provided for that user.',
+        };
+      } 
+
       return {
         'status': 'error',
         'message': e.message ?? 'An unknown error occurred',
