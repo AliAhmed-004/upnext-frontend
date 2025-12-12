@@ -60,7 +60,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
-                  _obscure ? Icons.visibility_off : Icons.visibility,
+                  !_obscure ? Icons.visibility_off : Icons.visibility,
                 ),
                 onPressed: () {
                   setState(() {
