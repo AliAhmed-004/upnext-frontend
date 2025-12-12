@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:upnext/services/firestore_service.dart';
 import 'package:upnext/theme_provider.dart';
 
+import '../components/custom_snackbar.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -107,10 +109,13 @@ class _ProfilePageState extends State<ProfilePage> {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         if (mounted) {
-          Get.snackbar(
-            'Location Services Disabled',
-            'Please enable location services in your device settings.',
-            backgroundColor: Colors.red[200],
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackbar.show(
+              title: 'Location Services Disabled',
+              message:
+                  'Please enable location services in your device settings.',
+              type: SnackbarType.error,
+            ),
           );
         }
         setState(() {
@@ -125,10 +130,13 @@ class _ProfilePageState extends State<ProfilePage> {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           if (mounted) {
-            Get.snackbar(
-              'Permission Denied',
-              'Location permission is required to update your location.',
-              backgroundColor: Colors.red[200],
+            ScaffoldMessenger.of(context).showSnackBar(
+              CustomSnackbar.show(
+                title: 'Permission Denied',
+                message:
+                    'Location permission is required to update your location.',
+                type: SnackbarType.error,
+              ),
             );
           }
           setState(() {
@@ -140,10 +148,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
-          Get.snackbar(
-            'Permission Permanently Denied',
-            'Please enable location permissions in your device settings.',
-            backgroundColor: Colors.red[200],
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackbar.show(
+              title: 'Permission Permanently Denied',
+              message:
+                  'Please enable location permissions in your device settings.',
+              type: SnackbarType.error,
+            ),
           );
         }
         setState(() {
@@ -178,19 +189,23 @@ class _ProfilePageState extends State<ProfilePage> {
       });
 
       if (mounted) {
-        Get.snackbar(
-          'Location Updated',
-          'Your location has been updated successfully.',
-          backgroundColor: Colors.green[200],
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Location Updated',
+            message: 'Your location has been updated successfully.',
+            type: SnackbarType.success,
+          ),
         );
       }
     } catch (e) {
       debugPrint('Error getting location: $e');
       if (mounted) {
-        Get.snackbar(
-          'Error Updating Location',
-          'Error: ${e.toString()}',
-          backgroundColor: Colors.red[200],
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Error Updating Location',
+            message: e.toString(),
+            type: SnackbarType.success,
+          ),
         );
       }
     } finally {

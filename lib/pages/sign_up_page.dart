@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:upnext/services/auth_service.dart';
 
 import '../components/custom_button.dart';
+import '../components/custom_snackbar.dart';
 import '../components/custom_textfield.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -38,29 +39,35 @@ class _SignUpPageState extends State<SignUpPage> {
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-      Get.snackbar(
-        'Validation Error',
-        'Please fill in all fields',
-        backgroundColor: Colors.red[200],
-      );
+            ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Validation Error',
+            message: 'Please fill in all fields',
+            type: SnackbarType.error,
+          ),
+        );
       return;
     }
 
     if (!email.contains('@')) {
-      Get.snackbar(
-        'Validation Error',
-        'Please enter a valid email address',
-        backgroundColor: Colors.red[200],
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Validation Error',
+            message: 'Please enter a valid email address',
+            type: SnackbarType.error,
+          ),
+        );
       return;
     }
 
     if (password != confirmPassword) {
-      Get.snackbar(
-        'Validation Error',
-        'Passwords do not match',
-        backgroundColor: Colors.red[200],
-      );
+      ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Validation Error',
+            message: 'Passwords do not match',
+            type: SnackbarType.error,
+          ),
+        );
       return;
     }
 
@@ -79,10 +86,12 @@ class _SignUpPageState extends State<SignUpPage> {
       final message = response['message'];
 
       if (status != 'success') {
-        Get.snackbar(
-          'Sign Up Failed',
-          '$message',
-          backgroundColor: Colors.red[200],
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Sign Up Failed',
+            message: message,
+            type: SnackbarType.error,
+          ),
         );
         return;
       }

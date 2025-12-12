@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../env.dart';
+import '../components/custom_snackbar.dart';
 
 class ItemLocationPickerPage extends StatefulWidget {
   const ItemLocationPickerPage({super.key});
@@ -25,10 +26,13 @@ class _ItemLocationPickerPageState extends State<ItemLocationPickerPage> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       if (!mounted) return;
-      Get.snackbar(
-        'Location Disabled',
-        'Please turn on the device\'s GPS.',
-        backgroundColor: Colors.red[200],
+      debugPrint('Location services are disabled.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Location Services Disabled',
+          message: 'Please enable location services to continue.',
+          type: SnackbarType.error,
+        ),
       );
       return;
     }
@@ -38,20 +42,26 @@ class _ItemLocationPickerPageState extends State<ItemLocationPickerPage> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        Get.snackbar(
-          'Permission Denied',
-          'Location permission is required.',
-          backgroundColor: Colors.red[200],
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Permission Denied',
+            message: 'Location permission is required.',
+            type: SnackbarType.error,
+          ),
         );
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      Get.snackbar(
-        'Permission Denied',
-        'Please enable location in settings.',
-        backgroundColor: Colors.red[200],
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Permission Denied',
+          message: 'Please enable location in settings.',
+          type: SnackbarType.error,
+        ),
       );
       return;
     }

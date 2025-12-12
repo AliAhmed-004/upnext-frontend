@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:upnext/components/custom_snackbar.dart';
 import 'package:upnext/helper/helper_methods.dart';
 import 'package:upnext/services/firestore_service.dart';
 
@@ -47,19 +48,23 @@ class _CreateListingPageState extends State<CreateListingPage> {
     final status = Status.active.name;
 
     if (selectedLocation == null) {
-      Get.snackbar(
-        'Location Required',
-        'Please pick a location for the listing.',
-        backgroundColor: Colors.red[200],
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Location Required',
+          message: 'Please pick a location for the listing.',
+          type: SnackbarType.error,
+        ),
       );
       return;
     }
 
     if (title.isEmpty || description.isEmpty || selectedCategory == null) {
-      Get.snackbar(
-        'Missing Information',
-        'Please fill in all required fields.',
-        backgroundColor: Colors.red[200],
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Missing Information',
+          message: 'Please fill in all required fields.',
+          type: SnackbarType.error,
+        ),
       );
       return;
     }

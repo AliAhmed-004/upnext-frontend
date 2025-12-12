@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../components/custom_button.dart';
+import '../components/custom_snackbar.dart';
 import '../components/custom_textfield.dart';
 import '../services/auth_service.dart';
 import '../providers/user_provider.dart';
@@ -31,20 +32,25 @@ class _LoginPageState extends State<LoginPage> {
     String password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      Get.snackbar(
-        'Validation Error',
-        'Please fill in all fields',
-        backgroundColor: Colors.red[200],
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Validation Error',
+          message: 'Please fill in all fields.',
+          type: SnackbarType.error,
+        ),
       );
       return;
     }
 
     if (!email.contains('@')) {
-      Get.snackbar(
-        'Validation Error',
-        'Please enter a valid email address',
-        backgroundColor: Colors.red[200],
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Validation Error',
+          message: 'Please fill in all fields.',
+          type: SnackbarType.error,
+        ),
       );
+
       return;
     }
 
@@ -59,10 +65,12 @@ class _LoginPageState extends State<LoginPage> {
         await context.read<UserProvider>().loadUser();
         Get.offAllNamed('/home');
       } else {
-        Get.snackbar(
-          'Login Failed',
-          response['message'] ?? 'Please try again.',
-          backgroundColor: Colors.red[200],
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Login Failed',
+            message: response['message'] ?? 'Please try again.',
+            type: SnackbarType.error,
+          ),
         );
       }
     } finally {
@@ -74,7 +82,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
