@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:upnext/services/auth_service.dart';
 // FIREBASE - Import commented out as unused during migration
 // import 'package:upnext/services/auth_service.dart';
 
@@ -74,48 +75,19 @@ class _SignUpPageState extends State<SignUpPage> {
 
     setState(() => _isLoading = true);
 
-    /* FIREBASE SIGNUP - COMMENTED OUT
     try {
-      final response = await AuthService.signupWithFirebase(
-        email,
-        password,
-        username,
-      );
+      final authService = AuthService();
+      await authService.signUpWithEmail(email, password);
 
+      // Navigate to Home Page on successful signup
       if (!mounted) return;
-
-      final status = response['status'];
-      final message = response['message'];
-
-      if (status != 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Sign Up Failed',
-            message: message,
-            type: SnackbarType.error,
-          ),
-        );
-        return;
-      }
-
       Get.offAllNamed('/home');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-    */
-
-    // TEMPORARY - SHOW CONSTRUCTION MESSAGE
-    try {
-      await Future.delayed(const Duration(seconds: 1));
-
-      if (!mounted) return;
-
+    } catch (e) {
+      debugPrint('Signup error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         CustomSnackbar.show(
-          title: 'App Under Construction',
-          message: 'We are migrating to Supabase. Please try again later.',
+          title: 'Signup Error',
+          message: 'Error: $e',
           type: SnackbarType.error,
         ),
       );
@@ -237,7 +209,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   GestureDetector(
                     onTap: () {
                       // Navigate to Login Page
-                      Get.back();
+                      Get.offAllNamed('/login');
                     },
                     child: Text(
                       'Sign In',

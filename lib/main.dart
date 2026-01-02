@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:upnext/pages/auth_page.dart';
 import 'package:upnext/pages/create_listing_page.dart';
 import 'package:upnext/pages/item_location_picker_page.dart';
 import 'package:upnext/pages/login_page.dart';
@@ -56,9 +57,9 @@ class UpNext extends StatelessWidget {
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
       themeMode: themeProvider.themeMode,
-      initialRoute: '/login', // Changed from /auth - Firebase commented out
+      initialRoute: '/auth', // Changed from /auth - Firebase commented out
       getPages: [
-        // GetPage(name: '/auth', page: () => AuthPage()), // FIREBASE - Commented out
+        GetPage(name: '/auth', page: () => AuthPage()), // FIREBASE - Commented out
         GetPage(name: '/login', page: () => const LoginPage()),
         GetPage(name: '/home', page: () => const HomePage()),
         GetPage(name: '/signup', page: () => const SignUpPage()),

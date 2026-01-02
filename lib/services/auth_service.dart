@@ -108,4 +108,29 @@ class AuthService {
   // static Future<void> logoutFromFirebase() async {
   //   debugPrint('Logout disabled during migration');
   // }
+  final SupabaseClient _supabase = Supabase.instance.client;
+
+  // Sign in with email and password
+  Future<AuthResponse> signInWithEmail(String email, String password) async {
+    return await _supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+  // Sign up with email and password
+  Future<AuthResponse> signUpWithEmail(String email, String password) async {
+    return await _supabase.auth.signUp(email: email, password: password);
+  }
+
+  // Sign out from Supabase
+  Future<void> signOut() async {
+    await _supabase.auth.signOut();
+  }
+
+  // get user email
+  String? getUserEmail() {
+    final session = _supabase.auth.currentSession;
+    return session?.user.email;
+  }
 }

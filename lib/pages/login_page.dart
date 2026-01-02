@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:upnext/services/auth_service.dart';
 // FIREBASE - Imports commented out as unused during migration
 // import 'package:provider/provider.dart';
 // import '../services/auth_service.dart';
@@ -56,6 +57,21 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() => _isLoading = true);
+
+    // Attempt login with Supabase
+    final authService = AuthService();
+
+    try {
+      final response = await authService.signInWithEmail(email, password);
+
+      if (!mounted) return;
+
+      
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
 
     /* FIREBASE LOGIN - COMMENTED OUT
     try {
