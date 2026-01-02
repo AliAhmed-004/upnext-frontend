@@ -1,14 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:upnext/services/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_snackbar.dart';
 import 'package:upnext/helper/helper_methods.dart';
-import 'package:upnext/services/firestore_service.dart';
 
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/custom_textfield.dart';
-import 'package:upnext/models/listing_model.dart';
+// FIREBASE - Import commented out as unused during migration
+// import 'package:upnext/models/listing_model.dart';
 
 class CreateListingPage extends StatefulWidget {
   const CreateListingPage({super.key});
@@ -34,8 +36,21 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
   // create listing button call
   void createListing() async {
-    final User? user = FirebaseAuth.instance.currentUser;
+    // FIREBASE - COMMENTED OUT
+    // final User? user = FirebaseAuth.instance.currentUser;
 
+    // TEMPORARY - Show construction message
+    ScaffoldMessenger.of(context).showSnackBar(
+      CustomSnackbar.show(
+        title: 'App Under Construction',
+        message:
+            'We are migrating to Supabase. Cannot create listings at this time.',
+        type: SnackbarType.error,
+      ),
+    );
+    return;
+
+    /* FIREBASE CODE - COMMENTED OUT
     debugPrint("Creating Listing...");
     final title = titleController.text.trim();
     final description = descriptionController.text.trim();
@@ -95,6 +110,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
         setState(() => _isCreating = false);
       }
     }
+    */
   }
 
   @override

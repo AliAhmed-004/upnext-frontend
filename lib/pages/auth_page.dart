@@ -1,13 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION TO SUPABASE
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:upnext/pages/home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:upnext/pages/home_page.dart';
 import 'package:upnext/pages/login_page.dart';
 
+// FIREBASE AUTH PAGE - DISABLED DURING MIGRATION
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Return login page directly - Firebase auth disabled
+    return const LoginPage();
+
+    /* FIREBASE AUTH STREAM - COMMENTED OUT
     return Scaffold(
       body: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -82,5 +88,6 @@ class AuthPage extends StatelessWidget {
         },
       ),
     );
+    */
   }
 }

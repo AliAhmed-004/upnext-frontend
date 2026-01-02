@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
+// FIREBASE - Imports commented out as unused during migration
+// import 'package:provider/provider.dart';
+// import '../services/auth_service.dart';
+// import '../providers/user_provider.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_snackbar.dart';
 import '../components/custom_textfield.dart';
-import '../services/auth_service.dart';
-import '../providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -56,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _isLoading = true);
 
+    /* FIREBASE LOGIN - COMMENTED OUT
     try {
       final response = await AuthService.loginWithFirebase(email, password);
 
@@ -78,7 +80,28 @@ class _LoginPageState extends State<LoginPage> {
         setState(() => _isLoading = false);
       }
     }
-}
+    */
+
+    // TEMPORARY - SHOW CONSTRUCTION MESSAGE
+    try {
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'App Under Construction',
+          message: 'We are migrating to Supabase. Please try again later.',
+          type: SnackbarType.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:upnext/services/auth_service.dart';
+// FIREBASE - Import commented out as unused during migration
+// import 'package:upnext/services/auth_service.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_snackbar.dart';
@@ -39,40 +40,41 @@ class _SignUpPageState extends State<SignUpPage> {
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Validation Error',
-            message: 'Please fill in all fields',
-            type: SnackbarType.error,
-          ),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Validation Error',
+          message: 'Please fill in all fields',
+          type: SnackbarType.error,
+        ),
+      );
       return;
     }
 
     if (!email.contains('@')) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Validation Error',
-            message: 'Please enter a valid email address',
-            type: SnackbarType.error,
-          ),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Validation Error',
+          message: 'Please enter a valid email address',
+          type: SnackbarType.error,
+        ),
+      );
       return;
     }
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Validation Error',
-            message: 'Passwords do not match',
-            type: SnackbarType.error,
-          ),
-        );
+        CustomSnackbar.show(
+          title: 'Validation Error',
+          message: 'Passwords do not match',
+          type: SnackbarType.error,
+        ),
+      );
       return;
     }
 
     setState(() => _isLoading = true);
 
+    /* FIREBASE SIGNUP - COMMENTED OUT
     try {
       final response = await AuthService.signupWithFirebase(
         email,
@@ -97,6 +99,26 @@ class _SignUpPageState extends State<SignUpPage> {
       }
 
       Get.offAllNamed('/home');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+    */
+
+    // TEMPORARY - SHOW CONSTRUCTION MESSAGE
+    try {
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'App Under Construction',
+          message: 'We are migrating to Supabase. Please try again later.',
+          type: SnackbarType.error,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

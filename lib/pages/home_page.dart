@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:upnext/components/listing_tile.dart';
+// FIREBASE - Imports commented out as unused during migration
+// import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/models/listing_model.dart';
 import 'package:upnext/providers/user_provider.dart';
-import 'package:upnext/services/firestore_service.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION
+// import 'package:upnext/services/firestore_service.dart';
 
-import '../components/custom_button.dart';
+// FIREBASE - Imports commented out as unused during migration
+// import '../components/custom_button.dart';
 import '../providers/listing_provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,10 +20,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final FirestoreService _firestoreService = FirestoreService();
+  // FIREBASE - COMMENTED OUT
+  // final FirestoreService _firestoreService = FirestoreService();
   List<ListingModel> _currentListings = [];
-  bool _hasNewListings = false;
-  int _streamListingsCount = 0;
+  // FIREBASE - Fields not used during migration
+  // bool _hasNewListings = false;
+  // int _streamListingsCount = 0;
 
   @override
   void initState() {
@@ -35,16 +40,20 @@ class _HomePageState extends State<HomePage> {
       if (mounted) {
         setState(() {
           _currentListings = context.read<ListingProvider>().listings;
-          _streamListingsCount = _currentListings.length;
-          _hasNewListings = false;
+          // FIREBASE - Fields commented out during migration
+          // _streamListingsCount = _currentListings.length;
+          // _hasNewListings = false;
         });
       }
     });
   }
 
   void _onStreamUpdate(List<ListingModel> streamListings) {
+    // FIREBASE - COMMENTED OUT - Method not used during migration
+    /*
     // Check if there are new or updated listings compared to what we're showing
-    if (_currentListings.isNotEmpty && streamListings.length != _streamListingsCount) {
+    if (_currentListings.isNotEmpty &&
+        streamListings.length != _streamListingsCount) {
       if (mounted && !_hasNewListings) {
         setState(() {
           _hasNewListings = true;
@@ -52,13 +61,17 @@ class _HomePageState extends State<HomePage> {
       }
     }
     _streamListingsCount = streamListings.length;
+    */
   }
 
   void _refreshAndDismissBanner() {
+    // FIREBASE - COMMENTED OUT - Method not used during migration
+    /*
     setState(() {
       _hasNewListings = false;
     });
     _getListings();
+    */
   }
 
   // Logout confirmation dialog
@@ -93,6 +106,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final provider = context.watch<ListingProvider>();
 
+    // FIREBASE STREAM - COMMENTED OUT, NOW SHOWING STATIC MESSAGE
+    return _buildScaffold(context, provider, []);
+
+    /* FIREBASE STREAM BUILDER - COMMENTED OUT
     return StreamBuilder<List<ListingModel>>(
       stream: _firestoreService.listingsStream(),
       builder: (context, snapshot) {
@@ -191,8 +208,95 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+    */
   }
 
+  // Helper method to build scaffold - used when Firebase is disabled
+  Widget _buildScaffold(
+    BuildContext context,
+    ListingProvider provider,
+    List<ListingModel> streamListings,
+  ) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('App is under construction')),
+          );
+        },
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text(
+          'Create',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
+        elevation: 0,
+      ),
+      appBar: AppBar(
+        title: const Text(
+          'Up Next',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            Get.toNamed('/profile')!.then((_) => _getListings());
+          },
+          icon: const Icon(Icons.person_outline_rounded),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(60),
+                      ),
+                      child: const Icon(
+                        Icons.construction,
+                        size: 60,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'App is under construction',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 40),
+                      child: Text(
+                        'We are migrating to Supabase. Please check back soon!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // FIREBASE - COMMENTED OUT - Method not used during migration
+  /*
   Widget _buildListContent(ListingProvider provider) {
     if (provider.isLoading) {
       return ListView(
@@ -204,10 +308,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 CircularProgressIndicator(),
                 SizedBox(height: 16),
-                Text(
-                  'Loading listings...',
-                  style: TextStyle(fontSize: 16),
-                ),
+                Text('Loading listings...', style: TextStyle(fontSize: 16)),
               ],
             ),
           ),
@@ -230,18 +331,12 @@ class _HomePageState extends State<HomePage> {
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(60),
                   ),
-                  child: const Icon(
-                    Icons.search_off_outlined,
-                    size: 60,
-                  ),
+                  child: const Icon(Icons.search_off_outlined, size: 60),
                 ),
                 const SizedBox(height: 24),
                 const Text(
                   'No listings found',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -275,10 +370,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: provider.listings.length,
       itemBuilder: (context, index) {
         final listing = provider.listings[index];
@@ -298,4 +390,5 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+  */
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:upnext/services/firestore_service.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION
+// import 'package:upnext/services/firestore_service.dart';
 
 import '../models/listing_model.dart';
 import '../pages/listing_details_page.dart';
@@ -26,16 +27,19 @@ class ListingTile extends StatefulWidget {
 
 class _ListingTileState extends State<ListingTile> {
   late final ListingModel listing;
-  String _userName = "Loading...";
+  String _userName = "Unknown User"; // Changed default during migration
 
   @override
   void initState() {
     super.initState();
     listing = widget.listingModel;
 
-    _loadUserName();
+    // FIREBASE - COMMENTED OUT
+    // _loadUserName();
   }
 
+  // FIREBASE - COMMENTED OUT
+  /*
   // get user name from listing user id
   void _loadUserName() async {
     final FirestoreService firestoreService = FirestoreService();
@@ -45,6 +49,7 @@ class _ListingTileState extends State<ListingTile> {
       _userName = userData['username'];
     });
   }
+  */
 
   @override
   Widget build(BuildContext context) {

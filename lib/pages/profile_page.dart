@@ -6,7 +6,8 @@ import 'package:upnext/helper/helper_methods.dart';
 import 'package:upnext/models/user_model.dart';
 import 'package:upnext/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:upnext/services/firestore_service.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION
+// import 'package:upnext/services/firestore_service.dart';
 import 'package:upnext/theme_provider.dart';
 
 import '../components/custom_snackbar.dart';
@@ -48,7 +49,9 @@ class _ProfilePageState extends State<ProfilePage> {
   // Get user from database
   void _getUserInfo() async {
     setState(() => isLoading = true);
-    final fetchedUser = await FirestoreService().fetchCurrentUserDetails();
+    // FIREBASE - COMMENTED OUT
+    // final fetchedUser = await FirestoreService().fetchCurrentUserDetails();
+    final UserModel? fetchedUser = null; // Placeholder during migration
 
     // debug print all fields of fetchedUser
     debugPrint('Fetched user data:');
@@ -172,11 +175,11 @@ class _ProfilePageState extends State<ProfilePage> {
         'Current location: ${position.latitude}, ${position.longitude}',
       );
 
-      // Update user location in Firestore
-      await FirestoreService().updateUserLocation(
-        position.latitude,
-        position.longitude,
-      );
+      // FIREBASE - Update user location in Firestore - COMMENTED OUT
+      // await FirestoreService().updateUserLocation(
+      //   position.latitude,
+      //   position.longitude,
+      // );
 
       // Get address from coordinates
       final address = await getAddressFromLatLng(
@@ -217,7 +220,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Get number of listings
   void _fetchNumberOfListings() async {
-    final count = await FirestoreService().fetchCurrentUserListingsCount();
+    // FIREBASE - COMMENTED OUT
+    // final count = await FirestoreService().fetchCurrentUserListingsCount();
+    final count = 0; // Placeholder during migration
     if (mounted) {
       setState(() {
         numberOfListings = count;
@@ -227,7 +232,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Get number of booked items
   void _fetchNumberOfBookedItems() async {
-    final count = await FirestoreService().fetchBookedListingsCount();
+    // FIREBASE - COMMENTED OUT
+    // final count = await FirestoreService().fetchBookedListingsCount();
+    final count = 0; // Placeholder during migration
     if (mounted) {
       setState(() {
         numberOfBookedItems = count;
@@ -436,7 +443,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
                   CustomButton(
                     onPressed: () {
-                      AuthService.logoutFromFirebase();
+                      // AuthService.logoutFromFirebase();
                       Get.offAllNamed('/login');
                     },
                     buttonText: 'Sign Out',

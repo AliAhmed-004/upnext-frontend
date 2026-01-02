@@ -1,10 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION TO SUPABASE
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:upnext/models/listing_model.dart';
 import 'package:upnext/models/user_model.dart';
 
 class FirestoreService {
+  /*
+  // FIREBASE FIRESTORE CODE - COMMENTED OUT FOR MIGRATION
   // Firestore instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -443,5 +446,77 @@ class FirestoreService {
       debugPrint('Error fetching booked listings count: $e');
       return 0;
     }
+  }
+  */
+
+  // TEMPORARY PLACEHOLDER METHODS FOR MIGRATION TO SUPABASE
+
+  List<ListingModel> _listings = [];
+  List<ListingModel> get listings => _listings;
+
+  Stream<List<ListingModel>> listingsStream() {
+    return Stream.value([]);
+  }
+
+  Future<Map<String, dynamic>> addUser(
+    dynamic user,
+    UserModel userModel,
+  ) async {
+    return {'status': 'error', 'message': 'App is under construction'};
+  }
+
+  Future<Map<String, dynamic>> addListing(
+    Map<String, dynamic> listingData,
+  ) async {
+    return {'status': 'error', 'message': 'App is under construction'};
+  }
+
+  Future<List<ListingModel>> fetchListings() async {
+    debugPrint('Firebase disabled - App under construction');
+    return [];
+  }
+
+  Future<List<ListingModel>> fetchCurrentUserListings() async {
+    return [];
+  }
+
+  Future<int> fetchCurrentUserListingsCount() async {
+    return 0;
+  }
+
+  Future<void> updateUserLocation(double lat, double long) async {
+    debugPrint('User location update disabled during migration');
+  }
+
+  Future<UserModel?> fetchCurrentUserDetails() async {
+    return null;
+  }
+
+  Future<Map<String, dynamic>> fetchUserById(String userId) async {
+    return {'username': 'Unknown User'};
+  }
+
+  Future<ListingModel?> fetchListingById(String listingId) async {
+    return null;
+  }
+
+  Future<Map<String, dynamic>> deleteListing(String listingId) async {
+    return {'status': 'error', 'message': 'App is under construction'};
+  }
+
+  Future<Map<String, dynamic>> bookListing(String listingId) async {
+    return {'success': false, 'message': 'App is under construction'};
+  }
+
+  Future<Map<String, dynamic>> cancelBooking(String listingId) async {
+    return {'success': false, 'message': 'App is under construction'};
+  }
+
+  Future<List<ListingModel>> fetchBookedListings() async {
+    return [];
+  }
+
+  Future<int> fetchBookedListingsCount() async {
+    return 0;
   }
 }

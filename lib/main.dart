@@ -1,9 +1,11 @@
-import 'package:firebase_core/firebase_core.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION TO SUPABASE
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:upnext/firebase_options.dart';
+// import 'package:upnext/pages/auth_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:upnext/firebase_options.dart';
-import 'package:upnext/pages/auth_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:upnext/pages/create_listing_page.dart';
 import 'package:upnext/pages/item_location_picker_page.dart';
 import 'package:upnext/pages/login_page.dart';
@@ -22,7 +24,13 @@ import 'providers/user_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Setup Supabase
+  await Supabase.initialize(
+    url: 'https://cfiajgroecyvjcrosupq.supabase.co',
+    anonKey: 'sb_publishable_bU5ITjn3aPPJPFGsXjBG7A_5wf6y_l7',
+  );
 
   runApp(
     MultiProvider(
@@ -48,9 +56,9 @@ class UpNext extends StatelessWidget {
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
       themeMode: themeProvider.themeMode,
-      initialRoute: '/auth',
+      initialRoute: '/login', // Changed from /auth - Firebase commented out
       getPages: [
-        GetPage(name: '/auth', page: () => AuthPage()),
+        // GetPage(name: '/auth', page: () => AuthPage()), // FIREBASE - Commented out
         GetPage(name: '/login', page: () => const LoginPage()),
         GetPage(name: '/home', page: () => const HomePage()),
         GetPage(name: '/signup', page: () => const SignUpPage()),

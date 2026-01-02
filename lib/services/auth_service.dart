@@ -1,9 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION TO SUPABASE
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:upnext/services/firestore_service.dart';
+// import 'package:upnext/models/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:upnext/models/user_model.dart';
-import 'package:upnext/services/firestore_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
+  // FIREBASE AUTHENTICATION METHODS - COMMENTED OUT FOR MIGRATION
+  /*
   // Firebase Authentication Methods
   static Future<Map<String, dynamic>> signupWithFirebase(
     String email,
@@ -83,4 +87,25 @@ class AuthService {
     await FirebaseAuth.instance.signOut();
     debugPrint('User logged out from Firebase');
   }
+  */
+
+  // TEMPORARY PLACEHOLDER METHODS FOR MIGRATION
+  // static Future<Map<String, dynamic>> signupWithFirebase(
+  //   String email,
+  //   String password,
+  //   String username,
+  // ) async {
+  //   return {'status': 'error', 'message': 'App is under construction. Please try again later.'};
+  // }
+
+  // static Future<Map<String, dynamic>> loginWithFirebase(
+  //   String email,
+  //   String password,
+  // ) async {
+  //   return {'status': 'error', 'message': 'App is under construction. Please try again later.'};
+  // }
+
+  // static Future<void> logoutFromFirebase() async {
+  //   debugPrint('Logout disabled during migration');
+  // }
 }

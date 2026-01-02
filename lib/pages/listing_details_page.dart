@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/item_location_map.dart';
-import 'package:upnext/services/firestore_service.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION
+// import 'package:upnext/services/firestore_service.dart';
 
 import '../helper/helper_methods.dart';
 import '../models/listing_model.dart';
@@ -40,6 +41,8 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
   }
 
   void getListingDetails() async {
+    // FIREBASE - COMMENTED OUT
+    /*
     final FirestoreService firestoreService = FirestoreService();
     final result = await firestoreService.fetchListingById(listingId);
 
@@ -55,6 +58,17 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
       _status = result.status;
       _location = LatLng(result.latitude, result.longitude);
       _createdBy = username;
+    });
+    */
+
+    // Placeholder during migration
+    setState(() {
+      _title = "Item unavailable";
+      _description = "App is under construction";
+      _category = "N/A";
+      _formattedDate = "N/A";
+      _status = "unavailable";
+      _createdBy = "Unknown";
     });
   }
 
@@ -80,12 +94,17 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
 
     if (confirmed != true) return;
 
-    final result = await FirestoreService().bookListing(listingId);
+    // FIREBASE - COMMENTED OUT
+    // final result = await FirestoreService().bookListing(listingId);
+    final result = {'success': false, 'message': 'App is under construction'};
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message']),
-          backgroundColor: result['success'] == true ? Colors.green : Colors.red,
+          content: Text(result['message']?.toString() ?? 'Unknown error'),
+          backgroundColor: result['success'] == true
+              ? Colors.green
+              : Colors.red,
         ),
       );
       if (result['success'] == true) {
@@ -266,7 +285,6 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
 
               const SizedBox(height: 24),
 
-
               // category
               Text(
                 "Category: $_category",
@@ -284,11 +302,8 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
 
               // Button to book the listing if it's not from user listings and status is active
               if (!widget.isFromUserListings && _status == Status.active.name)
-                CustomButton(
-                  onPressed: _bookListing,
-                  buttonText: "Book Item",
-                ),
-              
+                CustomButton(onPressed: _bookListing, buttonText: "Book Item"),
+
               // Show message if listing is already booked
               if (!widget.isFromUserListings && _status == Status.booked.name)
                 Container(
@@ -306,7 +321,10 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
                       SizedBox(width: 8),
                       Text(
                         'This item has already been booked',
-                        style: TextStyle(color: Colors.orange, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
