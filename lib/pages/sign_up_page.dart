@@ -77,7 +77,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     try {
       final authService = AuthService();
-      await authService.signUpWithEmail(email, password);
+      await authService.signUpWithEmail(email, password, username);
 
       // Navigate to Home Page on successful signup
       if (!mounted) return;
