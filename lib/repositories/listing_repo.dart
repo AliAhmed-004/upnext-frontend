@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:upnext/models/listing_model.dart';
+import 'package:upnext/services/supabase_service.dart';
 // FIREBASE - COMMENTED OUT FOR MIGRATION
 // import 'package:upnext/services/firestore_service.dart';
 
 class ListingRepo {
-  // FIREBASE - COMMENTED OUT
-  // final FirestoreService _firestoreService = FirestoreService();
+  final supabaseService = SupabaseService();
 
   Future<List<ListingModel>> getListings() async {
-    /* FIREBASE - COMMENTED OUT
     try {
-      debugPrint('Fetching listings from FirestoreService using repo');
-      final listings = await _firestoreService.fetchListings();
+      debugPrint('Fetching listings from SupabaseService using repo');
+
+      final listings = await supabaseService.fetchAllListings();
       return listings;
     } catch (error) {
       debugPrint('Error in ListingRepo getListings: $error');
       return [];
     }
-    */
-    debugPrint('Firebase disabled - returning empty list');
-    return [];
   }
 
   Future<List<ListingModel>> getListingsByUserId(String userId) async {
