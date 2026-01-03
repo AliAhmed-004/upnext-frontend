@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:upnext/components/custom_snackbar.dart';
 import 'package:upnext/helper/helper_methods.dart';
 
@@ -9,6 +8,7 @@ import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/custom_textfield.dart';
 import 'package:upnext/models/listing_model.dart';
 import 'package:upnext/models/user_model.dart';
+import 'package:upnext/services/auth_service.dart';
 import 'package:upnext/services/supabase_service.dart';
 
 class CreateListingPage extends StatefulWidget {
@@ -49,8 +49,10 @@ class _CreateListingPageState extends State<CreateListingPage> {
     // );
     // return;
 
-    final SupabaseService supabaseService = SupabaseService();
-    final userEmail = supabaseService.getCurrentUserEmail();
+    final authService = AuthService();
+    final supabaseService = SupabaseService();
+
+    final userEmail = authService.getUserEmail();
     if (userEmail == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         CustomSnackbar.show(

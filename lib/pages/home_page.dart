@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
+import 'package:upnext/components/custom_button.dart';
+import 'package:upnext/components/listing_tile.dart';
 // FIREBASE - Imports commented out as unused during migration
 // import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/models/listing_model.dart';
@@ -23,9 +25,6 @@ class _HomePageState extends State<HomePage> {
   // FIREBASE - COMMENTED OUT
   // final FirestoreService _firestoreService = FirestoreService();
   List<ListingModel> _currentListings = [];
-  // FIREBASE - Fields not used during migration
-  // bool _hasNewListings = false;
-  // int _streamListingsCount = 0;
 
   @override
   void initState() {
@@ -40,38 +39,9 @@ class _HomePageState extends State<HomePage> {
       if (mounted) {
         setState(() {
           _currentListings = context.read<ListingProvider>().listings;
-          // FIREBASE - Fields commented out during migration
-          // _streamListingsCount = _currentListings.length;
-          // _hasNewListings = false;
         });
       }
     });
-  }
-
-  void _onStreamUpdate(List<ListingModel> streamListings) {
-    // FIREBASE - COMMENTED OUT - Method not used during migration
-    /*
-    // Check if there are new or updated listings compared to what we're showing
-    if (_currentListings.isNotEmpty &&
-        streamListings.length != _streamListingsCount) {
-      if (mounted && !_hasNewListings) {
-        setState(() {
-          _hasNewListings = true;
-        });
-      }
-    }
-    _streamListingsCount = streamListings.length;
-    */
-  }
-
-  void _refreshAndDismissBanner() {
-    // FIREBASE - COMMENTED OUT - Method not used during migration
-    /*
-    setState(() {
-      _hasNewListings = false;
-    });
-    _getListings();
-    */
   }
 
   // Logout confirmation dialog
@@ -106,124 +76,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final provider = context.watch<ListingProvider>();
 
-    // FIREBASE STREAM - COMMENTED OUT, NOW SHOWING STATIC MESSAGE
-    return _buildScaffold(context, provider, []);
-
-    /* FIREBASE STREAM BUILDER - COMMENTED OUT
-    return StreamBuilder<List<ListingModel>>(
-      stream: _firestoreService.listingsStream(),
-      builder: (context, snapshot) {
-        // Listen to stream updates to detect new listings
-        if (snapshot.hasData) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _onStreamUpdate(snapshot.data!);
-          });
-        }
-
-        return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              Get.toNamed('/create_listing')!.then((_) => _getListings());
-            },
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text(
-              'Create',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-            ),
-            elevation: 0,
-          ),
-          appBar: AppBar(
-            title: const Text(
-              'Up Next',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
-            ),
-            leading: IconButton(
-              onPressed: () {
-                Get.toNamed('/profile')!.then((_) => _getListings());
-              },
-              icon: const Icon(Icons.person_outline_rounded),
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-          body: SafeArea(
-            child: Column(
-              children: [
-                // New listings available banner
-                if (_hasNewListings)
-                  Material(
-                    color: Theme.of(context).colorScheme.primary,
-                    child: InkWell(
-                      onTap: _refreshAndDismissBanner,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.refresh,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'New listings available. Tap to refresh!',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                // Main content
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () async {
-                      await provider.getListings(forceRefresh: true);
-                      if (mounted) {
-                        setState(() {
-                          _currentListings = provider.listings;
-                          _hasNewListings = false;
-                        });
-                      }
-                    },
-                    child: _buildListContent(provider),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-    */
-  }
-
-  // Helper method to build scaffold - used when Firebase is disabled
-  Widget _buildScaffold(
-    BuildContext context,
-    ListingProvider provider,
-    List<ListingModel> streamListings,
-  ) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('App is under construction')),
-          );
+          Get.toNamed('/create_listing')!.then((_) => _getListings());
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
         icon: const Icon(Icons.add, color: Colors.white),
@@ -250,43 +107,18 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: [
+            // New listings available banner
             Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(60),
-                      ),
-                      child: const Icon(
-                        Icons.construction,
-                        size: 60,
-                        color: Colors.orange,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'App is under construction',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40),
-                      child: Text(
-                        'We are migrating to Supabase. Please check back soon!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                      ),
-                    ),
-                  ],
-                ),
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await provider.getListings(forceRefresh: true);
+                  if (mounted) {
+                    setState(() {
+                      _currentListings = provider.listings;
+                    });
+                  }
+                },
+                child: _buildListContent(provider),
               ),
             ),
           ],
@@ -295,8 +127,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // FIREBASE - COMMENTED OUT - Method not used during migration
-  /*
   Widget _buildListContent(ListingProvider provider) {
     if (provider.isLoading) {
       return ListView(
@@ -382,7 +212,6 @@ class _HomePageState extends State<HomePage> {
             if (mounted) {
               setState(() {
                 _currentListings = provider.listings;
-                _hasNewListings = false;
               });
             }
           },
@@ -390,5 +219,4 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-  */
 }

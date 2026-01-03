@@ -22,9 +22,6 @@ class ListingProvider extends ChangeNotifier {
       _listings = await _repo.getListings();
 
       debugPrint('Listings fetched: ${_listings.length}');
-      for (var listing in _listings) {
-        debugPrint('Listing ID: ${listing.id}, Title: ${listing.title}');
-      }
     } catch (e) {
       debugPrint('Error in ListingProvider getListings: $e');
     } finally {

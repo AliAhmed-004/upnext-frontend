@@ -18,10 +18,10 @@ class SupabaseService {
    * USERS TABLE OPERATIONS
    * 
    */
-  // Fetch current user email
-  String? getCurrentUserEmail() {
+  // Fetch current user's id
+  String? getCurrentUserId() {
     final user = supabase.auth.currentUser;
-    return user?.email;
+    return user?.id;
   }
 
   // Fetch user data from table
@@ -43,7 +43,7 @@ class SupabaseService {
 
   // Update user location
   Future<void> updateUserLocation(double latitude, double longitude) async {
-    final email = getCurrentUserEmail();
+    final email = supabase.auth.currentUser?.email;
 
     if (email == null) {
       return;
@@ -67,7 +67,7 @@ class SupabaseService {
   // Fetch all listings except current user's from Lisrings table
   Future<List<ListingModel>> fetchAllListings() async {
     // Get current user's id from Users table
-    final currentUserEmail = getCurrentUserEmail();
+    final currentUserEmail = supabase.auth.currentUser?.email;
     if (currentUserEmail == null) {
       return [];
     }
@@ -84,5 +84,36 @@ class SupabaseService {
 
     // Convert listings to List<ListingModel>
     return listings.map((listing) => ListingModel.fromMap(listing)).toList();
+  }
+
+  // Fetch current user's listings
+  Future<List<ListingModel>> fetchCurrentUserListings() async {
+    // Get currentUserId
+    final userId = getCurrentUserId();
+
+    if (userId == null) {
+      return [];
+    }
+
+    final rawUserListings = await listingsTable
+        .select('*')
+        .eq('user_id', userId);
+
+    final userListings = rawUserListings
+        .map<ListingModel>((listing) => ListingModel.fromMap(listing))
+        .toList();
+
+    return userListings;
+  }
+
+  // Delete listing by id
+  Future<Map<String, String>> deleteListing(String listingId) async {
+    try {
+      await listingsTable.delete().eq('id', listingId);
+      return {'status': 'success'};
+    } catch (e) {
+      debugPrint('Error deleting listing: $e');
+      return {'status': 'error', 'message': e.toString()};
+    }
   }
 }

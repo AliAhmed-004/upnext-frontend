@@ -5,6 +5,7 @@ import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/helper/helper_methods.dart';
 import 'package:upnext/models/user_model.dart';
 import 'package:provider/provider.dart';
+import 'package:upnext/services/auth_service.dart';
 import 'package:upnext/services/supabase_service.dart';
 import 'package:upnext/theme_provider.dart';
 
@@ -49,8 +50,9 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => isLoading = true);
     // Fetch user from Supabase Service
     final SupabaseService supabaseService = SupabaseService();
+    final authService = AuthService();
 
-    final currentUserEmail = supabaseService.getCurrentUserEmail();
+    final currentUserEmail = authService.getUserEmail();
     final userFromDb = await supabaseService.fetchUserData(currentUserEmail!);
 
     if (userFromDb == null) {
