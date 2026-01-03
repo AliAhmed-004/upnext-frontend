@@ -358,14 +358,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ? 'Loading...'
                                       : 'Location not set yet'),
                             ),
-                            trailing: !hasLocation
-                                ? IconButton(
-                                    icon: const Icon(Icons.my_location),
-                                    onPressed: isLoading
-                                        ? null
-                                        : _updateLocation,
-                                  )
-                                : null,
                           ),
                         ],
                       ),
