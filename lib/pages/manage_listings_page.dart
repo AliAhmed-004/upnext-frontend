@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/models/listing_model.dart';
-import 'package:upnext/services/firestore_service.dart';
 import 'package:upnext/services/supabase_service.dart';
 
 class ManageListingsPage extends StatefulWidget {

@@ -3,15 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/listing_tile.dart';
-// FIREBASE - Imports commented out as unused during migration
-// import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/models/listing_model.dart';
 import 'package:upnext/providers/user_provider.dart';
-// FIREBASE - COMMENTED OUT FOR MIGRATION
-// import 'package:upnext/services/firestore_service.dart';
-
-// FIREBASE - Imports commented out as unused during migration
-// import '../components/custom_button.dart';
 import '../providers/listing_provider.dart';
 
 class HomePage extends StatefulWidget {
