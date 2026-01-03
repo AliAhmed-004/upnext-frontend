@@ -18,11 +18,6 @@ class SupabaseService {
    * USERS TABLE OPERATIONS
    * 
    */
-  // Add user to Supabase
-  Future<void> addUser(Map<String, dynamic> userData) async {
-    await userTable.insert(userData);
-  }
-
   // Fetch current user email
   String? getCurrentUserEmail() {
     final user = supabase.auth.currentUser;
@@ -39,6 +34,24 @@ class SupabaseService {
       debugPrint('Error fetching user data: $e');
       return null;
     }
+  }
+
+  // Add user to Supabase
+  Future<void> addUser(Map<String, dynamic> userData) async {
+    await userTable.insert(userData);
+  }
+
+  // Update user location
+  Future<void> updateUserLocation(double latitude, double longitude) async {
+    final email = getCurrentUserEmail();
+
+    if (email == null) {
+      return;
+    }
+
+    await userTable
+        .update({'latitude': latitude, 'longitude': longitude})
+        .eq('email', email);
   }
 
   /*
@@ -73,4 +86,3 @@ class SupabaseService {
     return listings.map((listing) => ListingModel.fromMap(listing)).toList();
   }
 }
-
