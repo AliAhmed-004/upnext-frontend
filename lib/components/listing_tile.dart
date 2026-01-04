@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:upnext/services/supabase_service.dart';
 // FIREBASE - COMMENTED OUT FOR MIGRATION
 // import 'package:upnext/services/firestore_service.dart';
 
@@ -35,21 +36,19 @@ class _ListingTileState extends State<ListingTile> {
     listing = widget.listingModel;
 
     // FIREBASE - COMMENTED OUT
-    // _loadUserName();
+    _loadUserName();
   }
 
-  // FIREBASE - COMMENTED OUT
-  /*
   // get user name from listing user id
   void _loadUserName() async {
-    final FirestoreService firestoreService = FirestoreService();
-    final userData = await firestoreService.fetchUserById(listing.user_id);
+    final supabaseService = SupabaseService();
+
+    final userData = await supabaseService.fetchUserDataById(listing.user_id);
     if (!mounted) return;
     setState(() {
-      _userName = userData['username'];
+      _userName = userData?['username'] ?? "Unknown User";
     });
   }
-  */
 
   @override
   Widget build(BuildContext context) {

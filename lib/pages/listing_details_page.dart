@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/item_location_map.dart';
-// FIREBASE - COMMENTED OUT FOR MIGRATION
-// import 'package:upnext/services/firestore_service.dart';
+import 'package:upnext/services/supabase_service.dart';
 
 import '../helper/helper_methods.dart';
 import '../models/listing_model.dart';
@@ -41,35 +40,23 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
   }
 
   void getListingDetails() async {
-    // FIREBASE - COMMENTED OUT
-    /*
-    final FirestoreService firestoreService = FirestoreService();
-    final result = await firestoreService.fetchListingById(listingId);
+    final supabaseService = SupabaseService();
+    final listing = await supabaseService.fetchListingById(listingId);
 
-    final createdBy = result!.user_id;
-    final userData = await firestoreService.fetchUserById(createdBy);
-    final username = userData['username'];
-
-    setState(() {
-      _title = result.title;
-      _description = result.description;
-      _category = result.category;
-      _formattedDate = formatIsoDate(result.created_at);
-      _status = result.status;
-      _location = LatLng(result.latitude, result.longitude);
-      _createdBy = username;
-    });
-    */
-
-    // Placeholder during migration
-    setState(() {
-      _title = "Item unavailable";
-      _description = "App is under construction";
-      _category = "N/A";
-      _formattedDate = "N/A";
-      _status = "unavailable";
-      _createdBy = "Unknown";
-    });
+    if (listing != null) {
+      // Fetch user data
+      final userData = await supabaseService.fetchUserDataById(listing.user_id);
+      debugPrint('User Data: $userData');
+      setState(() {
+        _createdBy = userData?['username'] ?? 'Unknown User';
+        _title = listing.title;
+        _description = listing.description;
+        _category = listing.category;
+        _formattedDate = listing.created_at;
+        _status = listing.status;
+        _location = LatLng(listing.latitude, listing.longitude);
+      });
+    }
   }
 
   // Book listing function
@@ -95,19 +82,19 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
     if (confirmed != true) return;
 
     // FIREBASE - COMMENTED OUT
-    // final result = await FirestoreService().bookListing(listingId);
-    final result = {'success': false, 'message': 'App is under construction'};
+    final supabaseService = SupabaseService();
+    final result = await supabaseService.bookListing(listingId);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result['message']?.toString() ?? 'Unknown error'),
-          backgroundColor: result['success'] == true
+          backgroundColor: result['status'] == 'success'
               ? Colors.green
               : Colors.red,
         ),
       );
-      if (result['success'] == true) {
+      if (result['status'] == 'success') {
         // Refresh the listing details to show updated status
         getListingDetails();
       }

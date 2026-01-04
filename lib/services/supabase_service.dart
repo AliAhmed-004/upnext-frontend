@@ -36,6 +36,18 @@ class SupabaseService {
     }
   }
 
+  // Fetch user data by id
+  Future<Map<String, dynamic>?> fetchUserDataById(String userId) async {
+    try {
+      final userData = await userTable.select().eq('id', userId).single();
+
+      return userData;
+    } catch (e) {
+      debugPrint('Error fetching user data by id: $e');
+      return null;
+    }
+  }
+
   // Add user to Supabase
   Future<void> addUser(Map<String, dynamic> userData) async {
     await userTable.insert(userData);
@@ -86,6 +98,21 @@ class SupabaseService {
     return listings.map((listing) => ListingModel.fromMap(listing)).toList();
   }
 
+  // Fetch listing by id
+  Future<ListingModel?> fetchListingById(String listingId) async {
+    try {
+      final listingData = await listingsTable
+          .select()
+          .eq('id', listingId)
+          .single();
+
+      return ListingModel.fromMap(listingData);
+    } catch (e) {
+      debugPrint('Error fetching listing by id: $e');
+      return null;
+    }
+  }
+
   // Fetch current user's listings
   Future<List<ListingModel>> fetchCurrentUserListings() async {
     // Get currentUserId
@@ -104,6 +131,57 @@ class SupabaseService {
         .toList();
 
     return userListings;
+  }
+
+  // Book listing by id
+  Future<Map<String, String>> bookListing(String listingId) async {
+    try {
+      await listingsTable
+          .update({
+            'status': Status.booked.name,
+            'booked_at': DateTime.now().toIso8601String(),
+            'booked_by': getCurrentUserId(),
+          })
+          .eq('id', listingId);
+      return {'status': 'success', 'message': 'Listing booked successfully'};
+    } catch (e) {
+      debugPrint('Error booking listing: $e');
+      return {'status': 'error', 'message': e.toString()};
+    }
+  }
+
+  // Fetch booked listings for current user
+  Future<List<ListingModel>> fetchBookedListings() async {
+    final userId = getCurrentUserId();
+    if (userId == null) {
+      return [];
+    }
+    final rawBookedListings = await listingsTable
+        .select('*')
+        .eq('booked_by', userId);
+
+    final bookedListings = rawBookedListings
+        .map<ListingModel>((listing) => ListingModel.fromMap(listing))
+        .toList();
+
+    return bookedListings;
+  }
+
+  // Cancel booking by listing id
+  Future<Map<String, String>> cancelBooking(String listingId) async {
+    try {
+      await listingsTable
+          .update({
+            'status': Status.active.name,
+            'booked_at': null,
+            'booked_by': null,
+          })
+          .eq('id', listingId);
+      return {'status': 'success', 'message': 'Booking cancelled successfully'};
+    } catch (e) {
+      debugPrint('Error cancelling booking: $e');
+      return {'status': 'error', 'message': e.toString()};
+    }
   }
 
   // Delete listing by id

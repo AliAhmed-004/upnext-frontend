@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/models/listing_model.dart';
-import 'package:upnext/services/firestore_service.dart';
+import 'package:upnext/services/supabase_service.dart';
 
 class BookedListingsPage extends StatefulWidget {
   const BookedListingsPage({super.key});
@@ -11,7 +11,7 @@ class BookedListingsPage extends StatefulWidget {
 }
 
 class _BookedListingsPageState extends State<BookedListingsPage> {
-  final FirestoreService _firestoreService = FirestoreService();
+  final _supabaseService = SupabaseService();
   List<ListingModel> _bookedListings = [];
   bool _isLoading = true;
 
@@ -23,7 +23,7 @@ class _BookedListingsPageState extends State<BookedListingsPage> {
 
   Future<void> _loadBookedListings() async {
     setState(() => _isLoading = true);
-    final listings = await _firestoreService.fetchBookedListings();
+    final listings = await _supabaseService.fetchBookedListings();
     if (mounted) {
       setState(() {
         _bookedListings = listings;
@@ -56,15 +56,18 @@ class _BookedListingsPageState extends State<BookedListingsPage> {
 
     setState(() => _isLoading = true);
 
-    final result = await _firestoreService.cancelBooking(listingId);
+    final result = await _supabaseService.cancelBooking(listingId);
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message']),
-          backgroundColor: result['success'] == true ? Colors.green : Colors.red,
+          content: Text(result['message'] ?? 'An error occurred'),
+          backgroundColor: result['status'] == 'success'
+              ? Colors.green
+              : Colors.red,
         ),
       );
-      if (result['success'] == true) {
+      if (result['status'] == 'success') {
         _loadBookedListings();
       } else {
         setState(() => _isLoading = false);
@@ -75,54 +78,52 @@ class _BookedListingsPageState extends State<BookedListingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Booked Items'),
-      ),
+      appBar: AppBar(title: const Text('My Booked Items')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _bookedListings.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.bookmark_border,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No booked items yet',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Items you book will appear here',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.bookmark_border,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadBookedListings,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _bookedListings.length,
-                    itemBuilder: (context, index) {
-                      final listing = _bookedListings[index];
-                      return ListingTile(
-                        listingModel: listing,
-                        isFromUserListings: false,
-                        onCancel: () => _cancelBooking(listing.id),
-                      );
-                    },
+                  const SizedBox(height: 16),
+                  Text(
+                    'No booked items yet',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Items you book will appear here',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadBookedListings,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _bookedListings.length,
+                itemBuilder: (context, index) {
+                  final listing = _bookedListings[index];
+                  return ListingTile(
+                    listingModel: listing,
+                    isFromUserListings: false,
+                    onCancel: () => _cancelBooking(listing.id),
+                  );
+                },
+              ),
+            ),
     );
   }
 }
