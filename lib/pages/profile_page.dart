@@ -425,7 +425,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
                   CustomButton(
                     onPressed: () {
-                      // AuthService.logoutFromFirebase();
+                      final authService = AuthService();
+                      authService.signOut();
                       Get.offAllNamed('/login');
                     },
                     buttonText: 'Sign Out',
