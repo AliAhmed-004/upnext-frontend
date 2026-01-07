@@ -79,9 +79,9 @@ class _SignUpPageState extends State<SignUpPage> {
       final authService = AuthService();
       await authService.signUpWithEmail(email, password, username);
 
-      // Navigate to Home Page on successful signup
+      // Navigate to Verification Pending Page on successful signup
       if (!mounted) return;
-      Get.offAllNamed('/home');
+      Get.offAllNamed('/verification_pending');
     } catch (e) {
       debugPrint('Signup error: $e');
       ScaffoldMessenger.of(context).showSnackBar(

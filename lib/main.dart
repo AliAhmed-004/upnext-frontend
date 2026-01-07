@@ -12,6 +12,7 @@ import 'package:upnext/pages/item_location_picker_page.dart';
 import 'package:upnext/pages/login_page.dart';
 import 'package:upnext/pages/sign_up_page.dart';
 import 'package:upnext/pages/profile_page.dart';
+import 'package:upnext/pages/verfication_pending_page.dart';
 import 'package:upnext/theme_provider.dart';
 import 'package:upnext/app_themes.dart';
 
@@ -57,9 +58,9 @@ class UpNext extends StatelessWidget {
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
       themeMode: themeProvider.themeMode,
-      initialRoute: '/auth', // Changed from /auth - Firebase commented out
+      initialRoute: '/auth',
       getPages: [
-        GetPage(name: '/auth', page: () => AuthPage()), // FIREBASE - Commented out
+        GetPage(name: '/auth', page: () => AuthPage()),
         GetPage(name: '/login', page: () => const LoginPage()),
         GetPage(name: '/home', page: () => const HomePage()),
         GetPage(name: '/signup', page: () => const SignUpPage()),
@@ -77,6 +78,10 @@ class UpNext extends StatelessWidget {
         GetPage(
           name: '/booked_listings',
           page: () => const BookedListingsPage(),
+        ),
+        GetPage(
+          name: '/verification_pending',
+          page: () => VerficationPendingPage(),
         ),
       ],
     );
