@@ -1,14 +1,18 @@
-import 'package:firebase_core/firebase_core.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION TO SUPABASE
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:upnext/firebase_options.dart';
+// import 'package:upnext/pages/auth_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:upnext/firebase_options.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:upnext/pages/auth_page.dart';
 import 'package:upnext/pages/create_listing_page.dart';
 import 'package:upnext/pages/item_location_picker_page.dart';
 import 'package:upnext/pages/login_page.dart';
 import 'package:upnext/pages/sign_up_page.dart';
 import 'package:upnext/pages/profile_page.dart';
+import 'package:upnext/pages/verfication_pending_page.dart';
 import 'package:upnext/theme_provider.dart';
 import 'package:upnext/app_themes.dart';
 
@@ -22,7 +26,13 @@ import 'providers/user_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Setup Supabase
+  await Supabase.initialize(
+    url: 'https://cfiajgroecyvjcrosupq.supabase.co',
+    anonKey: 'sb_publishable_bU5ITjn3aPPJPFGsXjBG7A_5wf6y_l7',
+  );
 
   runApp(
     MultiProvider(
@@ -68,6 +78,10 @@ class UpNext extends StatelessWidget {
         GetPage(
           name: '/booked_listings',
           page: () => const BookedListingsPage(),
+        ),
+        GetPage(
+          name: '/verification_pending',
+          page: () => VerficationPendingPage(),
         ),
       ],
     );

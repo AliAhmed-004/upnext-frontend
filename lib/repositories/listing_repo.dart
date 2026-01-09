@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:upnext/models/listing_model.dart';
-import 'package:upnext/services/firestore_service.dart';
+import 'package:upnext/services/supabase_service.dart';
+// FIREBASE - COMMENTED OUT FOR MIGRATION
+// import 'package:upnext/services/firestore_service.dart';
 
 class ListingRepo {
-  final FirestoreService _firestoreService = FirestoreService();
+  final supabaseService = SupabaseService();
 
   Future<List<ListingModel>> getListings() async {
     try {
-      debugPrint('Fetching listings from FirestoreService using repo');
-      final listings = await _firestoreService.fetchListings();
+      debugPrint('Fetching listings from SupabaseService using repo');
+
+      final listings = await supabaseService.fetchAllListings();
       return listings;
     } catch (error) {
       debugPrint('Error in ListingRepo getListings: $error');
@@ -17,6 +20,7 @@ class ListingRepo {
   }
 
   Future<List<ListingModel>> getListingsByUserId(String userId) async {
+    /* FIREBASE - COMMENTED OUT
     try {
       // Fetch from Firestore for current user's listings
       final listings = await _firestoreService.fetchCurrentUserListings();
@@ -25,9 +29,12 @@ class ListingRepo {
       debugPrint('Error in ListingRepo getListingsByUserId: $error');
       return [];
     }
+    */
+    return [];
   }
 
   Future<bool> deleteListing(String listingId) async {
+    /* FIREBASE - COMMENTED OUT
     try {
       final result = await _firestoreService.deleteListing(listingId);
       return result['status'] == 'success';
@@ -35,5 +42,7 @@ class ListingRepo {
       debugPrint('Error in ListingRepo deleteListing: $error');
       return false;
     }
+    */
+    return false;
   }
 }

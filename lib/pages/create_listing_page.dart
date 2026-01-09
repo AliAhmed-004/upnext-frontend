@@ -1,14 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_snackbar.dart';
 import 'package:upnext/helper/helper_methods.dart';
-import 'package:upnext/services/firestore_service.dart';
 
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/components/custom_textfield.dart';
 import 'package:upnext/models/listing_model.dart';
+import 'package:upnext/models/user_model.dart';
+import 'package:upnext/services/auth_service.dart';
+import 'package:upnext/services/supabase_service.dart';
 
 class CreateListingPage extends StatefulWidget {
   const CreateListingPage({super.key});
@@ -34,7 +35,37 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
   // create listing button call
   void createListing() async {
-    final User? user = FirebaseAuth.instance.currentUser;
+    // FIREBASE - COMMENTED OUT
+    // final User? user = FirebaseAuth.instance.currentUser;
+
+    // TEMPORARY - Show construction message
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   CustomSnackbar.show(
+    //     title: 'App Under Construction',
+    //     message:
+    //         'We are migrating to Supabase. Cannot create listings at this time.',
+    //     type: SnackbarType.error,
+    //   ),
+    // );
+    // return;
+
+    final authService = AuthService();
+    final supabaseService = SupabaseService();
+
+    final userEmail = authService.getUserEmail();
+    if (userEmail == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'User Not Logged In',
+          message: 'Please log in to create a listing.',
+          type: SnackbarType.error,
+        ),
+      );
+      return;
+    }
+    final supabaseUser = await supabaseService.fetchUserData(userEmail);
+
+    final UserModel user = UserModel.fromMap(supabaseUser!);
 
     debugPrint("Creating Listing...");
     final title = titleController.text.trim();
@@ -42,7 +73,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
     debugPrint("Title: $title");
     debugPrint("Description: $description");
-    debugPrint("User ID: ${user!.uid}");
+    debugPrint("User ID: ${user.id}");
 
     final createdAt = DateTime.now().toIso8601String();
     final status = Status.active.name;
@@ -74,7 +105,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
     try {
       // Create the listing data
       final listingData = {
-        'user_id': user.uid,
+        'user_id': user.id,
         'title': title,
         'description': description,
         'created_at': createdAt,
@@ -84,8 +115,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
         'longitude': selectedLocation!.longitude,
       };
 
-      final FirestoreService firestoreService = FirestoreService();
-      await firestoreService.addListing(listingData);
+      await supabaseService.addListing(listingData);
 
       if (mounted) {
         Get.back();

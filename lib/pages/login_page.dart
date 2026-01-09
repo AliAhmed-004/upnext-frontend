@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:upnext/services/auth_service.dart';
+// FIREBASE - Imports commented out as unused during migration
+// import 'package:provider/provider.dart';
+// import '../services/auth_service.dart';
+// import '../providers/user_provider.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_snackbar.dart';
 import '../components/custom_textfield.dart';
-import '../services/auth_service.dart';
-import '../providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,6 +31,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login() async {
+    debugPrint("Logging in...");
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
@@ -56,29 +60,48 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _isLoading = true);
 
+    // Attempt login with Supabase
+    final authService = AuthService();
+
     try {
-      final response = await AuthService.loginWithFirebase(email, password);
+      await authService.signInWithEmail(email, password);
 
       if (!mounted) return;
 
-      if (response['status'] == 'success') {
-        await context.read<UserProvider>().loadUser();
-        Get.offAllNamed('/home');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Login Failed',
-            message: response['message'] ?? 'Please try again.',
-            type: SnackbarType.error,
-          ),
-        );
-      }
+      Get.offAllNamed('/home');
+    } on AuthApiException catch (e) {
+      debugPrint('Supabase Login error code: ${e.statusCode}');
+      debugPrint('Login error: ${e.message}');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: "Login Failed",
+          message: e.message,
+          type: SnackbarType.error,
+        ),
+      );
+    }
+    catch (e) {
+      debugPrint('Supabase Login error code: $e');
+      debugPrint('Login error: $e');
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Login Failed',
+          message: 'Error: $e',
+          type: SnackbarType.error,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
-}
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

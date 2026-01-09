@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:upnext/services/auth_service.dart';
+// FIREBASE - Import commented out as unused during migration
+// import 'package:upnext/services/auth_service.dart';
 
 import '../components/custom_button.dart';
 import '../components/custom_snackbar.dart';
@@ -39,64 +41,56 @@ class _SignUpPageState extends State<SignUpPage> {
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Validation Error',
-            message: 'Please fill in all fields',
-            type: SnackbarType.error,
-          ),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Validation Error',
+          message: 'Please fill in all fields',
+          type: SnackbarType.error,
+        ),
+      );
       return;
     }
 
     if (!email.contains('@')) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Validation Error',
-            message: 'Please enter a valid email address',
-            type: SnackbarType.error,
-          ),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Validation Error',
+          message: 'Please enter a valid email address',
+          type: SnackbarType.error,
+        ),
+      );
       return;
     }
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Validation Error',
-            message: 'Passwords do not match',
-            type: SnackbarType.error,
-          ),
-        );
+        CustomSnackbar.show(
+          title: 'Validation Error',
+          message: 'Passwords do not match',
+          type: SnackbarType.error,
+        ),
+      );
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      final response = await AuthService.signupWithFirebase(
-        email,
-        password,
-        username,
-      );
+      final authService = AuthService();
+      await authService.signUpWithEmail(email, password, username);
 
+      // Navigate to Verification Pending Page on successful signup
       if (!mounted) return;
-
-      final status = response['status'];
-      final message = response['message'];
-
-      if (status != 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackbar.show(
-            title: 'Sign Up Failed',
-            message: message,
-            type: SnackbarType.error,
-          ),
-        );
-        return;
-      }
-
-      Get.offAllNamed('/home');
+      Get.offAllNamed('/verification_pending');
+    } catch (e) {
+      debugPrint('Signup error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar.show(
+          title: 'Signup Error',
+          message: 'Error: $e',
+          type: SnackbarType.error,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -215,7 +209,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   GestureDetector(
                     onTap: () {
                       // Navigate to Login Page
-                      Get.back();
+                      Get.offAllNamed('/login');
                     },
                     child: Text(
                       'Sign In',

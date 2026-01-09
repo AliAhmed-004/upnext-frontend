@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import 'package:upnext/components/custom_button.dart';
 import 'package:upnext/helper/helper_methods.dart';
 import 'package:upnext/models/user_model.dart';
-import 'package:upnext/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:upnext/services/firestore_service.dart';
+import 'package:upnext/services/auth_service.dart';
+import 'package:upnext/services/supabase_service.dart';
 import 'package:upnext/theme_provider.dart';
 
 import '../components/custom_snackbar.dart';
@@ -48,41 +48,37 @@ class _ProfilePageState extends State<ProfilePage> {
   // Get user from database
   void _getUserInfo() async {
     setState(() => isLoading = true);
-    final fetchedUser = await FirestoreService().fetchCurrentUserDetails();
+    // Fetch user from Supabase Service
+    final SupabaseService supabaseService = SupabaseService();
+    final authService = AuthService();
 
-    // debug print all fields of fetchedUser
-    debugPrint('Fetched user data:');
-    if (fetchedUser != null) {
-      debugPrint('Username: ${fetchedUser.username}');
-      debugPrint('Email: ${fetchedUser.email}');
-      debugPrint('Latitude: ${fetchedUser.latitude}');
-      debugPrint('Longitude: ${fetchedUser.longitude}');
-      debugPrint('CreatedAt: ${fetchedUser.createdAt}');
-    }
+    final currentUserEmail = authService.getUserEmail();
+    final userFromDb = await supabaseService.fetchUserData(currentUserEmail!);
 
-    if (fetchedUser == null) {
-      debugPrint('No user data found.');
+    if (userFromDb == null) {
+      debugPrint('No user data found in database.');
       setState(() {
         isLoading = false;
       });
       return;
     }
 
+    final UserModel fetchedUser = UserModel.fromMap(userFromDb);
+
     setState(() {
       user = fetchedUser;
     });
 
-    // If user has location, get address
-    if (user!.latitude != null && user!.longitude != null) {
-      final address = await getAddressFromLatLng(
-        fetchedUser.latitude!,
-        fetchedUser.longitude!,
-      );
-      setState(() {
-        userAddress = address;
-        isLoading = false;
-      });
-    }
+    // debug print all fields of fetchedUser
+    debugPrint('Fetched user data:');
+    debugPrint('Username: ${fetchedUser.username}');
+    debugPrint('Email: ${fetchedUser.email}');
+    debugPrint('Latitude: ${fetchedUser.latitude}');
+    debugPrint('Longitude: ${fetchedUser.longitude}');
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   // Check if location is available
@@ -172,8 +168,9 @@ class _ProfilePageState extends State<ProfilePage> {
         'Current location: ${position.latitude}, ${position.longitude}',
       );
 
-      // Update user location in Firestore
-      await FirestoreService().updateUserLocation(
+      // Update user location in database
+      final SupabaseService supabaseService = SupabaseService();
+      await supabaseService.updateUserLocation(
         position.latitude,
         position.longitude,
       );
@@ -217,7 +214,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Get number of listings
   void _fetchNumberOfListings() async {
-    final count = await FirestoreService().fetchCurrentUserListingsCount();
+    // FIREBASE - COMMENTED OUT
+    // final count = await FirestoreService().fetchCurrentUserListingsCount();
+    final count = 0; // Placeholder during migration
     if (mounted) {
       setState(() {
         numberOfListings = count;
@@ -227,7 +226,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Get number of booked items
   void _fetchNumberOfBookedItems() async {
-    final count = await FirestoreService().fetchBookedListingsCount();
+    // FIREBASE - COMMENTED OUT
+    // final count = await FirestoreService().fetchBookedListingsCount();
+    final count = 0; // Placeholder during migration
     if (mounted) {
       setState(() {
         numberOfBookedItems = count;
@@ -243,9 +244,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final username = user!.username;
     final email = user!.email;
-    final createdAt = user!.createdAt!.toDate();
-
-    final formattedDate = formatIsoDate(createdAt.toIso8601String());
 
     final bool hasLocation = _hasLocation();
 
@@ -351,7 +349,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           ListTile(
                             leading: const Icon(Icons.event_outlined),
                             title: const Text('Joined'),
-                            subtitle: Text(formattedDate),
                           ),
                           const Divider(height: 0),
                           ListTile(
@@ -363,14 +360,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ? 'Loading...'
                                       : 'Location not set yet'),
                             ),
-                            trailing: !hasLocation
-                                ? IconButton(
-                                    icon: const Icon(Icons.my_location),
-                                    onPressed: isLoading
-                                        ? null
-                                        : _updateLocation,
-                                  )
-                                : null,
                           ),
                         ],
                       ),
@@ -436,7 +425,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
                   CustomButton(
                     onPressed: () {
-                      AuthService.logoutFromFirebase();
+                      final authService = AuthService();
+                      authService.signOut();
                       Get.offAllNamed('/login');
                     },
                     buttonText: 'Sign Out',

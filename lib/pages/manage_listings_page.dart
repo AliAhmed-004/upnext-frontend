@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:upnext/components/listing_tile.dart';
 import 'package:upnext/models/listing_model.dart';
-import 'package:upnext/services/firestore_service.dart';
+import 'package:upnext/services/supabase_service.dart';
 
 class ManageListingsPage extends StatefulWidget {
   const ManageListingsPage({super.key});
@@ -13,11 +13,11 @@ class ManageListingsPage extends StatefulWidget {
 class _ManageListingsPageState extends State<ManageListingsPage> {
   bool isLoading = true;
   List<ListingModel> listings = [];
-  final FirestoreService _firestoreService = FirestoreService();
+  final SupabaseService _supabaseService = SupabaseService();
 
   // Fetch Listings
   void fetchListings() async {
-    final fetchedListings = await _firestoreService.fetchCurrentUserListings();
+    final fetchedListings = await _supabaseService.fetchCurrentUserListings();
 
     setState(() {
       listings = fetchedListings;
@@ -55,7 +55,7 @@ class _ManageListingsPageState extends State<ManageListingsPage> {
 
     setState(() => isLoading = true);
 
-    final result = await _firestoreService.deleteListing(listingId);
+    final result = await _supabaseService.deleteListing(listingId);
 
     if (result['status'] == 'success') {
       if (mounted) {
