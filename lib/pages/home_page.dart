@@ -15,8 +15,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // FIREBASE - COMMENTED OUT
-  // final FirestoreService _firestoreService = FirestoreService();
   List<ListingModel> _currentListings = [];
 
   @override
