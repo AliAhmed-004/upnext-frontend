@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:upnext/models/listing_model.dart';
@@ -72,8 +74,17 @@ class SupabaseService {
    * 
    */
   // Add listing to Supabase
-  Future<void> addListing(Map<String, dynamic> listingData) async {
+  Future<void> addListing(Map<String, dynamic> listingData, List<File> images) async {
+    // Insert listing data into Listings table
     await listingsTable.insert(listingData);
+
+    // Upload images to Supabase Storage
+    for (var image in images) {
+      final fileName = image.path.split('/').last;
+      final storagePath = 'listings/${listingData['id']}/$fileName';
+
+      await supabase.storage.from('listing-images').upload(storagePath, image);
+    }
   }
 
   // Fetch all listings except current user's from Lisrings table

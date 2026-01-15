@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:upnext/components/custom_snackbar.dart';
 import 'package:upnext/helper/helper_methods.dart';
@@ -35,22 +38,9 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
   // create listing button call
   void createListing() async {
-    // FIREBASE - COMMENTED OUT
-    // final User? user = FirebaseAuth.instance.currentUser;
-
-    // TEMPORARY - Show construction message
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   CustomSnackbar.show(
-    //     title: 'App Under Construction',
-    //     message:
-    //         'We are migrating to Supabase. Cannot create listings at this time.',
-    //     type: SnackbarType.error,
-    //   ),
-    // );
-    // return;
-
     final authService = AuthService();
     final supabaseService = SupabaseService();
+    final image_picker = ImagePicker();
 
     final userEmail = authService.getUserEmail();
     if (userEmail == null) {
@@ -114,9 +104,20 @@ class _CreateListingPageState extends State<CreateListingPage> {
         'latitude': selectedLocation!.latitude,
         'longitude': selectedLocation!.longitude,
       };
+      
+      // Image picker
+      final images = await image_picker.pickMultiImage();
 
-      await supabaseService.addListing(listingData);
+      // convert XFile to File
+      List<File> imageFiles = [];
+      if (images.isNotEmpty) {
+        for (var img in images) {
+          imageFiles.add(File(img.path));
+        }
+      }
 
+      await supabaseService.addListing(listingData, imageFiles);
+      
       if (mounted) {
         Get.back();
       }
