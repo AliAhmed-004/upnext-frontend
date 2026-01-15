@@ -74,14 +74,24 @@ class SupabaseService {
    * 
    */
   // Add listing to Supabase
-  Future<void> addListing(Map<String, dynamic> listingData, List<File> images) async {
+  Future<void> addListing(
+    Map<String, dynamic> listingData,
+    List<File> images,
+  ) async {
     // Insert listing data into Listings table
-    await listingsTable.insert(listingData);
+    final listing = await listingsTable.insert(listingData).select().single();
 
     // Upload images to Supabase Storage
     for (var image in images) {
-      final fileName = image.path.split('/').last;
-      final storagePath = 'listings/${listingData['id']}/$fileName';
+      // extract file extension
+      final extension = image.path.split('.').last;      
+
+      final fileName =
+          DateTime.now().millisecondsSinceEpoch.toString() + '.$extension';
+      final storagePath = 'listings/${listing['id']}/$fileName';
+
+      debugPrint('Uploading image to $storagePath');
+      debugPrint('File Name: $fileName');
 
       await supabase.storage.from('listing-images').upload(storagePath, image);
     }
@@ -116,6 +126,28 @@ class SupabaseService {
           .select()
           .eq('id', listingId)
           .single();
+
+      // fetch images for each listing
+      // each image's name contains the listing id as prefix
+      debugPrint('Fetching images for listing ID: $listingId');
+
+      final List<FileObject> imageResponse = await supabase.storage
+          .from('listing-images')
+          .list(path: 'listings/$listingId');
+
+      debugPrint('Images fetched from response: ${imageResponse.length}');
+
+      final imageUrls = <String>[];
+      for (var item in imageResponse) {
+        final publicUrl = supabase.storage
+            .from('listing-images')
+            .getPublicUrl('listings/$listingId/${item.name}');
+        imageUrls.add(publicUrl);
+      }
+
+      listingData['image_urls'] = imageUrls;
+
+      debugPrint('Listings fetched with images');
 
       return ListingModel.fromMap(listingData);
     } catch (e) {

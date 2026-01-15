@@ -31,6 +31,7 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
   String _formattedDate = "Loading...";
   String _status = "Loading...";
   LatLng? _location;
+  List<String>? _imageUrls;
 
   @override
   void initState() {
@@ -42,6 +43,10 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
   void getListingDetails() async {
     final supabaseService = SupabaseService();
     final listing = await supabaseService.fetchListingById(listingId);
+
+    debugPrint('Images found: ${listing?.imageUrls?.length ?? 0}');
+
+    debugPrint('Image URLs found: ${listing!.imageUrls}');
 
     if (listing != null) {
       // Fetch user data
@@ -55,6 +60,7 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
         _formattedDate = listing.created_at;
         _status = listing.status;
         _location = LatLng(listing.latitude, listing.longitude);
+        _imageUrls = listing.imageUrls;
       });
     }
   }
@@ -81,7 +87,6 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
 
     if (confirmed != true) return;
 
-    // FIREBASE - COMMENTED OUT
     final supabaseService = SupabaseService();
     final result = await supabaseService.bookListing(listingId);
 
@@ -271,6 +276,52 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
               ),
 
               const SizedBox(height: 24),
+
+              // Images
+              if (_imageUrls != null && _imageUrls!.isNotEmpty) ...[
+                Text(
+                  "Images:",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 200,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _imageUrls!.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 16),
+                    itemBuilder: (context, index) {
+                      final imageUrl = _imageUrls![index];
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          imageUrl,
+                          width: 300,
+                          height: 200,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            width: 300,
+                            height: 200,
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.broken_image,
+                              size: 50,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
 
               // category
               Text(

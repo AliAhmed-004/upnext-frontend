@@ -12,6 +12,7 @@ class ListingModel {
   final double longitude;
   final String? booked_by; // User ID of who booked it
   final String? booked_at; // Timestamp when booked
+  final List<String>? imageUrls; // URL of the listing image
 
   ListingModel({
     required this.id,
@@ -24,7 +25,7 @@ class ListingModel {
     required this.latitude,
     required this.longitude,
     this.booked_by,
-    this.booked_at,
+    this.booked_at, this.imageUrls,
   });
 
   factory ListingModel.fromMap(Map<String, dynamic> map) {
@@ -40,6 +41,7 @@ class ListingModel {
       longitude: map['longitude'],
       booked_by: map['booked_by'],
       booked_at: map['booked_at'],
+      imageUrls: map['image_urls'] != null ? List<String>.from(map['image_urls']) : null,
     );
   }
 
@@ -56,6 +58,7 @@ class ListingModel {
       'longitude': longitude,
       'booked_by': booked_by,
       'booked_at': booked_at,
+      'image_urls': imageUrls,
     };
   }
 }
