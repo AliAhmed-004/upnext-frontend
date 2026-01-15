@@ -42,4 +42,18 @@ class ListingProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> getListingsByCategory(String category) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _listings = await _repo.getListingsByCategory(category);
+      debugPrint('Listings fetched for category $category: ${_listings.length}');
+    } catch (e) {
+      debugPrint('Error in ListingProvider getListingsByCategory: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

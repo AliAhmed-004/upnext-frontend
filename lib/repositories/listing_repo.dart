@@ -33,6 +33,17 @@ class ListingRepo {
     return [];
   }
 
+  Future<List<ListingModel>> getListingsByCategory(String category) async {
+    try {
+      debugPrint('Fetching listings for category: $category');
+      final listings = await supabaseService.fetchListingsByCategory(category);
+      return listings;
+    } catch (error) {
+      debugPrint('Error in ListingRepo getListingsByCategory: $error');
+      return [];
+    }
+  }
+
   Future<bool> deleteListing(String listingId) async {
     /* FIREBASE - COMMENTED OUT
     try {

@@ -98,6 +98,31 @@ class SupabaseService {
     return listings.map((listing) => ListingModel.fromMap(listing)).toList();
   }
 
+  // Fetch listings by category
+  Future<List<ListingModel>> fetchListingsByCategory(String category) async {
+    // Get current user's id from Users table
+    final currentUserEmail = supabase.auth.currentUser?.email;
+    if (currentUserEmail == null) {
+      return [];
+    }
+
+    final currentUserData = await fetchUserData(currentUserEmail);
+    if (currentUserData == null) {
+      return [];
+    }
+
+    final currentUserId = currentUserData['id'];
+
+    // Fetch listings by category except current user's
+    final listings = await listingsTable
+        .select()
+        .eq('category', category)
+        .neq('user_id', currentUserId);
+
+    // Convert listings to List<ListingModel>
+    return listings.map((listing) => ListingModel.fromMap(listing)).toList();
+  }
+
   // Fetch listing by id
   Future<ListingModel?> fetchListingById(String listingId) async {
     try {
