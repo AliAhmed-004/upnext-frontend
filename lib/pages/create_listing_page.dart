@@ -30,17 +30,49 @@ class _CreateListingPageState extends State<CreateListingPage> {
   LatLng? selectedLocation;
   String? selectedAddress;
   bool _isCreating = false;
+  List<File> selectedImages = [];
 
   @override
   void initState() {
     super.initState();
   }
 
+  // Pick images
+  Future<void> pickImages() async {
+    final imagePicker = ImagePicker();
+    try {
+      final images = await imagePicker.pickMultiImage();
+
+      if (images.isNotEmpty) {
+        setState(() {
+          selectedImages = images.map((img) => File(img.path)).toList();
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking images: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackbar.show(
+            title: 'Error',
+            message: 'Failed to pick images.',
+            type: SnackbarType.error,
+          ),
+        );
+      }
+    }
+  }
+
+  // Remove image from selection
+  void removeImage(int index) {
+    setState(() {
+      selectedImages.removeAt(index);
+    });
+  }
+
   // create listing button call
   void createListing() async {
     final authService = AuthService();
     final supabaseService = SupabaseService();
-    final image_picker = ImagePicker();
 
     final userEmail = authService.getUserEmail();
     if (userEmail == null) {
@@ -104,20 +136,9 @@ class _CreateListingPageState extends State<CreateListingPage> {
         'latitude': selectedLocation!.latitude,
         'longitude': selectedLocation!.longitude,
       };
-      
-      // Image picker
-      final images = await image_picker.pickMultiImage();
 
-      // convert XFile to File
-      List<File> imageFiles = [];
-      if (images.isNotEmpty) {
-        for (var img in images) {
-          imageFiles.add(File(img.path));
-        }
-      }
+      await supabaseService.addListing(listingData, selectedImages);
 
-      await supabaseService.addListing(listingData, imageFiles);
-      
       if (mounted) {
         Get.back();
       }
@@ -251,6 +272,122 @@ class _CreateListingPageState extends State<CreateListingPage> {
                 ),
               ),
               const SizedBox(height: 40),
+
+              // Image picker section
+              Text(
+                'Images',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Pick Images Button
+              OutlinedButton.icon(
+                onPressed: pickImages,
+                icon: Icon(Icons.add_photo_alternate_outlined),
+                label: Text('Pick Images'),
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  minimumSize: Size(double.infinity, 48),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Image Preview Grid
+              if (selectedImages.isNotEmpty) ...[
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withOpacity(0.3),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${selectedImages.length} image(s) selected',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                        itemCount: selectedImages.length,
+                        itemBuilder: (context, index) {
+                          return Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  selectedImages[index],
+                                  fit: BoxFit.cover,
+                                  cacheWidth: 300,
+                                  cacheHeight: 300,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey.shade300,
+                                      child: Icon(Icons.broken_image),
+                                    );
+                                  },
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: GestureDetector(
+                                  onTap: () => removeImage(index),
+                                  child: Container(
+                                    padding: EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ] else ...[
+                Text(
+                  'No images selected',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              const SizedBox(height: 24),
 
               SizedBox(
                 width: double.infinity,

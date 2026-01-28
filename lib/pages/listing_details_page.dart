@@ -48,22 +48,20 @@ class _ListingDetailsPageState extends State<ListingDetailsPage> {
 
     debugPrint('Image URLs found: ${listing!.imageUrls}');
 
-    if (listing != null) {
-      // Fetch user data
-      final userData = await supabaseService.fetchUserDataById(listing.user_id);
-      debugPrint('User Data: $userData');
-      setState(() {
-        _createdBy = userData?['username'] ?? 'Unknown User';
-        _title = listing.title;
-        _description = listing.description;
-        _category = listing.category;
-        _formattedDate = listing.created_at;
-        _status = listing.status;
-        _location = LatLng(listing.latitude, listing.longitude);
-        _imageUrls = listing.imageUrls;
-      });
+    // Fetch user data
+    final userData = await supabaseService.fetchUserDataById(listing.user_id);
+    debugPrint('User Data: $userData');
+    setState(() {
+      _createdBy = userData?['username'] ?? 'Unknown User';
+      _title = listing.title;
+      _description = listing.description;
+      _category = listing.category;
+      _formattedDate = listing.created_at;
+      _status = listing.status;
+      _location = LatLng(listing.latitude, listing.longitude);
+      _imageUrls = listing.imageUrls;
+    });
     }
-  }
 
   // Book listing function
   void _bookListing() async {
