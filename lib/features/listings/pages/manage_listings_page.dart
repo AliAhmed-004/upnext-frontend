@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:upnext/features/listings/providers/listing_provider.dart';
+import 'package:upnext/core/providers/listing_provider.dart';
 import 'package:upnext/features/listings/widgets/listing_tile.dart';
 
 /// Page for managing the current user's listings.

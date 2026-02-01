@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:upnext/core/constants/env.dart';
 
 // Core imports
 import 'package:upnext/core/theme/theme_provider.dart';
@@ -19,7 +20,7 @@ import 'package:upnext/features/listings/pages/item_location_picker_page.dart';
 import 'package:upnext/features/listings/pages/manage_listings_page.dart';
 import 'package:upnext/features/listings/pages/booked_listings_page.dart';
 import 'package:upnext/features/listings/pages/user_listings_page.dart';
-import 'package:upnext/features/listings/providers/listing_provider.dart';
+import 'package:upnext/core/providers/listing_provider.dart';
 import 'package:upnext/features/profile/pages/profile_page.dart';
 
 void main() async {
@@ -27,8 +28,8 @@ void main() async {
 
   // Setup Supabase
   await Supabase.initialize(
-    url: 'https://cfiajgroecyvjcrosupq.supabase.co',
-    anonKey: 'sb_publishable_bU5ITjn3aPPJPFGsXjBG7A_5wf6y_l7',
+    url: Env.supabaseUrl,
+    anonKey: Env.supabaseAnonKey,
   );
 
   runApp(

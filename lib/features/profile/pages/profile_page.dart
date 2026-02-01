@@ -7,7 +7,7 @@ import 'package:upnext/core/theme/theme_provider.dart';
 import 'package:upnext/core/utils/helper_methods.dart';
 import 'package:upnext/core/widgets/custom_button.dart';
 import 'package:upnext/core/widgets/custom_snackbar.dart';
-import 'package:upnext/features/listings/providers/listing_provider.dart';
+import 'package:upnext/core/providers/listing_provider.dart';
 
 /// Profile page displaying user information and app settings.
 /// 

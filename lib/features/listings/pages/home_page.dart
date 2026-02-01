@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:upnext/core/widgets/custom_button.dart';
-import 'package:upnext/features/listings/providers/listing_provider.dart';
+import 'package:upnext/core/providers/listing_provider.dart';
 import 'package:upnext/features/listings/widgets/listing_tile.dart';
 
 /// Home page displaying all available listings.
