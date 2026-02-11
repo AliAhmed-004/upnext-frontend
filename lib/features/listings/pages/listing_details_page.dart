@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:upnext/core/providers/user_provider.dart';
 import 'package:upnext/core/utils/helper_methods.dart';
 import 'package:upnext/core/widgets/custom_button.dart';
-import 'package:upnext/features/listings/models/listing_model.dart';
+import 'package:upnext/core/models/listing_model.dart';
 import 'package:upnext/core/providers/listing_provider.dart';
 import 'package:upnext/features/listings/widgets/item_location_map.dart';
 

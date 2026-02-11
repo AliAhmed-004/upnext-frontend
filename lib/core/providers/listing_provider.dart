@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:upnext/core/services/supabase_listing_service.dart';
-import 'package:upnext/features/listings/models/listing_model.dart';
+import 'package:upnext/core/models/listing_model.dart';
 
 /// Provider class that serves as the single source of truth for listing data.
 /// 

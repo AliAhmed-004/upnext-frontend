@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:upnext/core/services/supabase_storage_service.dart';
 import 'package:upnext/core/services/supabase_user_service.dart';
-import 'package:upnext/features/listings/models/listing_model.dart';
+import 'package:upnext/core/models/listing_model.dart';
 
 /// Service class handling all Supabase listing-related database operations.
 /// This includes CRUD operations for the Listings table.
