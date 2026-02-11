@@ -10,7 +10,7 @@ import 'package:upnext/core/utils/helper_methods.dart';
 import 'package:upnext/core/widgets/custom_button.dart';
 import 'package:upnext/core/widgets/custom_snackbar.dart';
 import 'package:upnext/core/widgets/custom_textfield.dart';
-import 'package:upnext/features/listings/models/listing_model.dart';
+import 'package:upnext/core/models/listing_model.dart';
 import 'package:upnext/core/providers/listing_provider.dart';
 
 /// Page for creating a new listing.
